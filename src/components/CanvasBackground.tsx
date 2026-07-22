@@ -90,6 +90,9 @@ export default function CanvasBackground() {
         <Sparkles count={120} scale={15} size={1.5} speed={0.2} opacity={0.8} color="#4A7A3A" />
         <Sparkles count={80} scale={20} size={3} speed={0.1} opacity={0.6} color="#FFFFFF" />
 
+        {/* Fantasy Zen Bamboo Leaves */}
+        <BambooLeaves count={40} />
+
         {/* Interactive Premium Presentation - Switched to OrbitControls for 100% stability */}
         <OrbitControls 
           enableZoom={false}

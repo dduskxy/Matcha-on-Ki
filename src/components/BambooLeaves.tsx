@@ -1,51 +1,100 @@
-import { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import { useRef, useMemo } from 'react';
+import { useFrame } from '@react-three/fiber';
+import * as THREE from 'three';
 
-export default function BambooLeaves() {
-  const [leaves, setLeaves] = useState<Array<{ id: number; left: string; delay: number; duration: number; size: number }>>([]);
+const createBambooLeafGeometry = () => {
+  const shape = new THREE.Shape();
+  // Tapered bamboo leaf silhouette
+  shape.moveTo(0, -0.6);
+  shape.quadraticCurveTo(0.12, -0.1, 0.08, 0.6);
+  shape.quadraticCurveTo(0, 0.7, -0.08, 0.6);
+  shape.quadraticCurveTo(-0.12, -0.1, 0, -0.6);
 
-  useEffect(() => {
-    // LESS IS MORE for Luxury Minimalist. Max 12 leaves.
-    const newLeaves = Array.from({ length: 12 }).map((_, i) => ({
-      id: i,
-      left: `${Math.random() * 100}%`,
-      delay: Math.random() * 20, 
-      // Extremely slow and smooth floating
-      duration: 25 + Math.random() * 20, 
-      size: 0.6 + Math.random() * 0.8, // Slightly smaller and more delicate
+  const geometry = new THREE.ShapeGeometry(shape, 12);
+  
+  // Subtle 3D curve along central vein
+  const pos = geometry.attributes.position;
+  for (let i = 0; i < pos.count; i++) {
+    const x = pos.getX(i);
+    const y = pos.getY(i);
+    // Subtle lengthwise bending + longitudinal fold
+    pos.setZ(i, -Math.pow(x, 2) * 2.5 + Math.sin((y + 0.6) * Math.PI) * 0.08);
+  }
+  geometry.computeVertexNormals();
+  return geometry;
+};
+
+export default function BambooLeaves({ count = 35 }) {
+  const meshRef = useRef<THREE.InstancedMesh>(null);
+  
+  const leafGeometry = useMemo(() => createBambooLeafGeometry(), []);
+  const dummy = useMemo(() => new THREE.Object3D(), []);
+  
+  const leaves = useMemo(() => {
+    return new Array(count).fill(0).map(() => ({
+      x: (Math.random() - 0.5) * 25,
+      y: Math.random() * 25 - 5,
+      z: (Math.random() - 0.5) * 15 - 5,
+      scale: Math.random() * 0.6 + 0.3,
+      speed: Math.random() * 0.02 + 0.008,
+      swaySpeed: Math.random() * 0.8 + 0.4,
+      swayPhase: Math.random() * Math.PI * 2,
+      rx: Math.random() * Math.PI * 2,
+      ry: Math.random() * Math.PI * 2,
+      rz: Math.random() * Math.PI * 2,
+      rs: (Math.random() - 0.5) * 0.015,
+      rySpeed: (Math.random() - 0.5) * 0.025,
     }));
-    setLeaves(newLeaves);
-  }, []);
+  }, [count]);
+
+  useFrame((state) => {
+    if (!meshRef.current) return;
+    const time = state.clock.getElapsedTime();
+
+    leaves.forEach((leaf, i) => {
+      // falling down
+      leaf.y -= leaf.speed;
+      
+      // loop back to top when they fall past the floor
+      if (leaf.y < -12) {
+        leaf.y = 15;
+        leaf.x = (Math.random() - 0.5) * 25;
+      }
+
+      // swaying side to side gently in the wind
+      const sway = Math.sin(time * leaf.swaySpeed + leaf.swayPhase) * 0.02;
+      leaf.x += sway;
+      leaf.z += sway * 0.3;
+
+      // tumbling / rotating gently
+      leaf.rx += leaf.rs;
+      leaf.ry += leaf.rySpeed;
+      leaf.rz += leaf.rs;
+
+      dummy.position.set(leaf.x, leaf.y, leaf.z);
+      dummy.rotation.set(leaf.rx, leaf.ry, leaf.rz);
+      dummy.scale.setScalar(leaf.scale);
+      dummy.updateMatrix();
+      
+      meshRef.current!.setMatrixAt(i, dummy.matrix);
+    });
+    
+    meshRef.current.instanceMatrix.needsUpdate = true;
+  });
 
   return (
-    <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
-      {leaves.map((leaf) => (
-        <motion.div
-          key={leaf.id}
-          initial={{ y: -100, x: 0, rotate: -20, opacity: 0 }}
-          animate={{ 
-            y: '105vh', 
-            x: [0, 60, -40, 0], // Very smooth, wide, slow swaying
-            rotate: [-20, 40, -10, 20], // Subtle, slow tilting instead of spinning
-            opacity: [0, 0.7, 0.7, 0] // Soft opacity
-          }}
-          transition={{
-            duration: leaf.duration,
-            delay: leaf.delay,
-            repeat: Infinity,
-            ease: "easeInOut" // Smooth easing instead of linear for X/rotate
-          }}
-          className="absolute top-0 shadow-sm"
-          style={{ 
-            left: leaf.left, 
-            width: `${10 * leaf.size}px`, 
-            height: `${35 * leaf.size}px`,
-            borderRadius: '0 100% 0 100%', 
-            background: 'linear-gradient(135deg, rgba(92, 138, 71, 0.6) 0%, rgba(54, 89, 44, 0.4) 100%)', // Lower opacity for elegance
-            filter: 'blur(1.5px)' // Pushed slightly out of focus to not distract
-          }}
-        />
-      ))}
-    </div>
+    <instancedMesh ref={meshRef} args={[leafGeometry, undefined, count]}>
+      <meshStandardMaterial 
+        color="#36592C"
+        emissive="#6BB352"
+        emissiveIntensity={0.25}
+        roughness={0.35}
+        metalness={0.15}
+        transparent={true}
+        opacity={0.82}
+        side={THREE.DoubleSide}
+        depthWrite={false}
+      />
+    </instancedMesh>
   );
 }
