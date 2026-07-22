@@ -83,7 +83,7 @@ export default function BambooLeaves({ count = 35 }) {
   });
 
   return (
-    <instancedMesh ref={meshRef} args={[leafGeometry, undefined, count]}>
+    <instancedMesh ref={meshRef} args={[leafGeometry, null, count]}>
       <meshStandardMaterial 
         color="#36592C"
         emissive="#6BB352"

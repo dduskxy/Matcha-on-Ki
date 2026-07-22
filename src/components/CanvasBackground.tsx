@@ -1,7 +1,7 @@
 import { useRef } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { motion } from 'framer-motion';
-import { Float, Environment, ContactShadows, Sparkles, OrbitControls } from '@react-three/drei';
+import { Float, ContactShadows, Sparkles, OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
 import BambooLeaves from './BambooLeaves';
 
@@ -60,11 +60,11 @@ const ZenRipple = () => {
     <group position={[0, -2.45, 0]} rotation={[-Math.PI / 2, 0, 0]}>
       <mesh ref={ringRef}>
         <ringGeometry args={[4, 4.02, 64]} />
-        <meshBasicMaterial color="#4A7A3A" transparent opacity={0.3} side={THREE.DoubleSide} />
+        <meshBasicMaterial color="#4A7A3A" transparent opacity={0.3} side={THREE.FrontSide} />
       </mesh>
       <mesh ref={ringRef2}>
         <ringGeometry args={[5, 5.01, 64]} />
-        <meshBasicMaterial color="#4A7A3A" transparent opacity={0.15} side={THREE.DoubleSide} />
+        <meshBasicMaterial color="#4A7A3A" transparent opacity={0.15} side={THREE.FrontSide} />
       </mesh>
     </group>
   );
@@ -78,7 +78,13 @@ export default function CanvasBackground() {
       transition={{ duration: 2.5, ease: "easeInOut" }}
       className="fixed inset-0 z-[-10]"
     >
-      <Canvas camera={{ position: [0, 0, 7], fov: 45 }} dpr={[1, 1.2]} performance={{ min: 0.5 }}>
+      <Canvas 
+        camera={{ position: [0, 0, 7], fov: 45 }} 
+        dpr={[1, 1.2]} 
+        performance={{ min: 0.5 }}
+        gl={{ antialias: false, stencil: false, depth: true, powerPreference: "high-performance" }}
+        raycaster={{ enabled: false }}
+      >
         
         {/* Cinematic Lighting Setup */}
         <ambientLight intensity={1.5} />
@@ -88,11 +94,11 @@ export default function CanvasBackground() {
         <spotLight position={[0, 10, -10]} intensity={15} color="#4A7A3A" distance={30} penumbra={1} />
         
         {/* Atmosphere Particles (Komorebi / Tea Dust) */}
-        <Sparkles count={120} scale={15} size={1.5} speed={0.2} opacity={0.8} color="#4A7A3A" />
-        <Sparkles count={80} scale={20} size={3} speed={0.1} opacity={0.6} color="#FFFFFF" />
+        <Sparkles count={40} scale={15} size={1.5} speed={0.2} opacity={0.6} color="#4A7A3A" />
+        <Sparkles count={20} scale={20} size={3} speed={0.1} opacity={0.4} color="#FFFFFF" />
 
         {/* Fantasy Zen Bamboo Leaves */}
-        <BambooLeaves count={40} />
+        <BambooLeaves count={25} />
 
         {/* Interactive Premium Presentation - Switched to OrbitControls for 100% stability */}
         <OrbitControls 
@@ -110,8 +116,7 @@ export default function CanvasBackground() {
         
         <ZenRipple />
         
-        <Environment preset="city" />
-        <ContactShadows position={[0, -2.5, 0]} opacity={0.4} scale={25} blur={2.5} far={4.5} resolution={256} frames={1} />
+        <ContactShadows position={[0, -2.5, 0]} opacity={0.4} scale={25} blur={2.5} far={4.5} resolution={128} frames={1} />
       </Canvas>
     </motion.div>
   );
