@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useLocation, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { menuData, type MenuItem } from '../data/menuData';
 import { Coffee, GlassWater, Leaf, Circle, Plus } from 'lucide-react';
 import { motion, AnimatePresence, type Variants } from 'framer-motion';
@@ -49,7 +49,7 @@ export default function Menu() {
   const [activeCategory, setActiveCategory] = useState<'All' | 'Matcha' | 'Coffee' | 'Tea' | 'Sweets'>('All');
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
   const addItem = useCartStore(state => state.addItem);
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
 
   useEffect(() => {
     const itemId = searchParams.get('item');
