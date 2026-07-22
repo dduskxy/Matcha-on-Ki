@@ -60,12 +60,12 @@ const SingleLeaf = ({ leaf, geometry }: { leaf: any, geometry: THREE.BufferGeome
     <mesh ref={meshRef} geometry={geometry}>
       <meshStandardMaterial 
         color="#36592C"
-        emissive="#6BB352"
-        emissiveIntensity={0.25}
-        roughness={0.35}
-        metalness={0.15}
+        emissive="#3E542C"
+        emissiveIntensity={0.1}
+        roughness={0.2}
+        metalness={0.1}
         transparent={true}
-        opacity={0.82}
+        opacity={0.9}
         side={THREE.DoubleSide}
         depthWrite={false}
       />
