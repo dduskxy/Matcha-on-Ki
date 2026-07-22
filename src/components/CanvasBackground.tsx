@@ -17,44 +17,42 @@ const ZenStones = () => {
 
   return (
     <group ref={groupRef} position={[0, -0.5, 0]} scale={1.3}>
-      {/* Bottom Stone (Polished Obsidian) */}
-      <mesh position={[0, -0.8, 0]} rotation={[0.05, 0.2, -0.05]} scale={[1.7, 0.5, 1.6]} castShadow receiveShadow>
+      {/* Bottom Stone (Matte Charcoal Slate - Stable Earth) */}
+      <mesh position={[0, -0.9, 0]} rotation={[0.05, 0.4, -0.05]} scale={[1.9, 0.4, 1.8]} castShadow receiveShadow>
         <sphereGeometry args={[1, 48, 48]} />
         <meshPhysicalMaterial 
-          color="#16181a" 
-          roughness={0.25} 
-          metalness={0.2}
-          clearcoat={1.0}
-          clearcoatRoughness={0.1}
+          color="#1c1c1a" 
+          roughness={0.8} 
+          metalness={0.1}
+          clearcoat={0.1}
+          clearcoatRoughness={0.8}
         />
       </mesh>
       
-      {/* Middle Stone (Matcha Jade) */}
-      <mesh position={[0.05, -0.1, 0.05]} rotation={[-0.1, -0.4, 0.05]} scale={[1.4, 0.4, 1.3]} castShadow receiveShadow>
+      {/* Middle Stone (Warm Beige River Stone - Humanity/Warmth) */}
+      <mesh position={[0.1, -0.3, 0.05]} rotation={[-0.1, -0.2, 0.1]} scale={[1.2, 0.35, 1.1]} castShadow receiveShadow>
         <sphereGeometry args={[1, 48, 48]} />
         <meshPhysicalMaterial 
-          color="#527048" 
-          roughness={0.15} 
-          metalness={0.1}
-          clearcoat={1.0}
-          clearcoatRoughness={0.15}
-          transmission={0.4}
-          thickness={0.5}
+          color="#d9d0c1" 
+          roughness={0.4} 
+          metalness={0.05}
+          clearcoat={0.5}
+          clearcoatRoughness={0.3}
         />
       </mesh>
 
-      {/* Top Stone (Frosted Quartz / Pearl) */}
-      <mesh position={[-0.05, 0.4, -0.05]} rotation={[0.1, 0.5, -0.1]} scale={[0.8, 0.3, 0.7]} castShadow receiveShadow>
+      {/* Top Stone (Frosted Matcha Jade - Nature/Tea) */}
+      <mesh position={[-0.05, 0.15, -0.05]} rotation={[0.15, 0.6, -0.15]} scale={[0.6, 0.25, 0.5]} castShadow receiveShadow>
         <sphereGeometry args={[1, 48, 48]} />
         <meshPhysicalMaterial 
-          color="#fdfdfd"
-          roughness={0.1}
-          metalness={0.05}
-          transmission={0.8}
-          ior={1.4}
-          thickness={1.2}
+          color="#eef5e6"
+          roughness={0.2}
+          metalness={0.0}
+          transmission={0.9}
+          ior={1.45}
+          thickness={1.0}
           clearcoat={1.0}
-          clearcoatRoughness={0.05}
+          clearcoatRoughness={0.1}
         />
       </mesh>
     </group>
@@ -104,31 +102,31 @@ export default function CanvasBackground() {
         
         {/* Cinematic 3-Point Lighting */}
         
-        {/* Ambient Fill (Soft Base Light) */}
-        <ambientLight intensity={0.4} color="#e8f0e6" />
+        {/* Ambient Fill (Soft Base Light - Warm Cream) */}
+        <ambientLight intensity={0.4} color="#faf7f2" />
         
-        {/* Key Light (Sun) - Casts crisp, soft-edged shadows */}
+        {/* Key Light (Sun) */}
         <directionalLight
           position={[6, 12, -4]}
-          intensity={3}
-          color="#fff5e6"
+          intensity={2.8}
+          color="#ffffff"
           castShadow
           shadow-mapSize={[512, 512]}
           shadow-bias={-0.0001}
         />
         
-        {/* Fill Light (Sky reflection) - Cool tone to contrast the warm sun */}
+        {/* Fill Light (Sky reflection) */}
         <directionalLight
           position={[-6, 6, 6]}
-          intensity={1.2}
-          color="#dbeafe"
+          intensity={1.0}
+          color="#e6f2ff"
         />
 
-        {/* Rim Light (Backlight) - Highlights the edges of the stones, making them pop in 3D */}
+        {/* Rim Light (Champagne Gold) - True Luxury edge highlighting */}
         <pointLight
-          position={[0, -2, -6]}
-          intensity={2}
-          color="#a8d5ba"
+          position={[0, -1.5, -5]}
+          intensity={2.5}
+          color="#d4af37"
         />
         
         {/* Morning Mist Particles */}
