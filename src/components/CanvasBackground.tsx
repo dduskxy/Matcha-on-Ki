@@ -10,43 +10,40 @@ const ZenStones = () => {
 
   useFrame((_, delta) => {
     if (groupRef.current) {
-      groupRef.current.rotation.y += delta * 0.05;
-      groupRef.current.position.y = -0.5 + Math.sin(_.clock.elapsedTime) * 0.1;
+      groupRef.current.rotation.y += delta * 0.03;
+      groupRef.current.position.y = -0.5 + Math.sin(_.clock.elapsedTime * 0.8) * 0.05;
     }
   });
 
   return (
-    <group ref={groupRef} position={[0, -0.5, 0]} scale={1.4}>
-      {/* Bottom Stone (Wet Charcoal) */}
-      <mesh position={[0, -0.6, 0]} rotation={[0.1, 0, -0.1]} scale={[1.8, 0.7, 1.6]} castShadow receiveShadow>
+    <group ref={groupRef} position={[0, -0.5, 0]} scale={1.3}>
+      {/* Bottom Stone (Dark Basalt) */}
+      <mesh position={[0, -0.8, 0]} rotation={[0.05, 0.2, -0.05]} scale={[1.7, 0.5, 1.6]} castShadow receiveShadow>
         <sphereGeometry args={[1, 64, 64]} />
         <meshStandardMaterial 
-          color="#222528" 
-          roughness={0.9} 
-          metalness={0.05} 
+          color="#3a3b3c" 
+          roughness={0.85} 
+          metalness={0.0} 
         />
       </mesh>
       
-      {/* Middle Stone (Polished Jade / Matcha with subsurface scattering) */}
-      <mesh position={[0.1, 0.3, 0.1]} rotation={[-0.2, 0.5, 0.2]} scale={[1.2, 0.5, 1.1]} castShadow receiveShadow>
+      {/* Middle Stone (Muted Jade) */}
+      <mesh position={[0.05, -0.1, 0.05]} rotation={[-0.1, -0.4, 0.05]} scale={[1.4, 0.4, 1.3]} castShadow receiveShadow>
         <sphereGeometry args={[1, 64, 64]} />
-        <meshPhysicalMaterial 
-          color="#6b8c68" 
-          transmission={0.4} 
-          thickness={1.5} 
-          roughness={0.7} 
+        <meshStandardMaterial 
+          color="#7c8f76" 
+          roughness={0.75} 
           metalness={0.0}
-          ior={1.4} 
         />
       </mesh>
 
-      {/* Top Stone (Wet Charcoal) */}
-      <mesh position={[-0.1, 0.9, 0]} rotation={[0.2, -0.2, 0.1]} scale={[0.7, 0.4, 0.6]} castShadow receiveShadow>
+      {/* Top Stone (Warm Sandstone) */}
+      <mesh position={[-0.05, 0.4, -0.05]} rotation={[0.1, 0.5, -0.1]} scale={[0.8, 0.3, 0.7]} castShadow receiveShadow>
         <sphereGeometry args={[1, 64, 64]} />
         <meshStandardMaterial 
-          color="#202326" 
-          roughness={0.85} 
-          metalness={0.05} 
+          color="#a8a29e" 
+          roughness={0.9} 
+          metalness={0.0} 
         />
       </mesh>
     </group>
