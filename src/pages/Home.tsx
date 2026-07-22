@@ -26,21 +26,18 @@ export default function Home() {
       <div className="absolute left-10 top-0 bottom-0 w-[1px] bg-luxury-charcoal/[0.08] hidden md:block"></div>
       <div className="absolute right-10 top-0 bottom-0 w-[1px] bg-luxury-charcoal/[0.08] hidden md:block"></div>
 
-      <div className="max-w-7xl mx-auto px-6 h-[80vh] flex flex-col justify-center items-center text-center relative z-10">
+      <div className="max-w-7xl mx-auto px-6 h-[85vh] flex flex-col justify-between items-center text-center relative z-10 pt-10 pb-4">
         
-        {/* Soft Zen Mist behind text for readability */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(252,251,248,0.85)_0%,rgba(252,251,248,0)_50%)] -z-10 pointer-events-none blur-xl"></div>
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(252,251,248,0.5)_0%,rgba(252,251,248,0)_70%)] -z-10 pointer-events-none"></div>
-
+        {/* Top Section: Title */}
         <motion.div 
           initial={{ opacity: 0, y: 30 }} 
           animate={{ opacity: 1, y: 0 }} 
           transition={{ duration: 1.2, ease: [0.2, 0.8, 0.2, 1] }}
-          className="relative w-full flex flex-col items-center"
+          className="w-full flex flex-col items-center mt-8"
         >
-          <span className="font-sans text-[10px] md:text-xs tracking-[0.5em] uppercase text-luxury-charcoal font-medium mb-10 block">The Art of Stillness</span>
+          <span className="font-sans text-[10px] md:text-xs tracking-[0.5em] uppercase text-luxury-charcoal font-medium mb-8 block">The Art of Stillness</span>
           
-          <h1 className="text-5xl md:text-7xl lg:text-8xl font-serif mb-12 text-luxury-charcoal leading-[1.1] tracking-wide relative flex flex-col items-center">
+          <h1 className="text-5xl md:text-7xl lg:text-8xl font-serif text-luxury-charcoal leading-[1.1] tracking-wide relative flex flex-col items-center">
             <span className="overflow-hidden block pb-2">
               <motion.span 
                 initial={{ y: "110%", rotate: 2, opacity: 0 }}
@@ -62,8 +59,16 @@ export default function Home() {
               </motion.span>
             </span>
           </h1>
-          
-          <p className="max-w-xl mx-auto text-sm md:text-base text-luxury-charcoal font-light leading-loose mb-16 relative">
+        </motion.div>
+
+        {/* Bottom Section: Paragraph & Button (Giving space for the 3D model in the middle) */}
+        <motion.div 
+          initial={{ opacity: 0, y: 30 }} 
+          animate={{ opacity: 1, y: 0 }} 
+          transition={{ duration: 1.2, ease: [0.2, 0.8, 0.2, 1], delay: 0.4 }}
+          className="w-full flex flex-col items-center mb-8"
+        >
+          <p className="max-w-xl mx-auto text-sm md:text-base text-luxury-charcoal font-light leading-loose mb-10 relative">
             <span className="absolute -left-6 top-3 w-4 h-[1px] bg-luxury-charcoal/40 hidden md:block"></span>
             <span className="absolute -right-6 top-3 w-4 h-[1px] bg-luxury-charcoal/40 hidden md:block"></span>
             A sanctuary where the ancient tradition of Uji matcha meets contemporary stillness. We embrace the beauty of negative space, allowing every drop to be measured in time.
