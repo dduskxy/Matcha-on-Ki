@@ -18,8 +18,8 @@ const ZenStones = () => {
   return (
     <group ref={groupRef} position={[0, -0.5, 0]} scale={1.4}>
       {/* Bottom Stone (Wet Charcoal) */}
-      <mesh position={[0, -0.6, 0]} rotation={[0.1, 0, -0.1]} scale={[1.8, 0.7, 1.6]}>
-        <sphereGeometry args={[1, 32, 16]} />
+      <mesh position={[0, -0.6, 0]} rotation={[0.1, 0, -0.1]} scale={[1.8, 0.7, 1.6]} castShadow receiveShadow>
+        <sphereGeometry args={[1, 64, 64]} />
         <meshStandardMaterial 
           color="#222528" 
           roughness={0.9} 
@@ -28,8 +28,8 @@ const ZenStones = () => {
       </mesh>
       
       {/* Middle Stone (Polished Jade / Matcha with subsurface scattering) */}
-      <mesh position={[0.1, 0.3, 0.1]} rotation={[-0.2, 0.5, 0.2]} scale={[1.2, 0.5, 1.1]}>
-        <sphereGeometry args={[1, 32, 16]} />
+      <mesh position={[0.1, 0.3, 0.1]} rotation={[-0.2, 0.5, 0.2]} scale={[1.2, 0.5, 1.1]} castShadow receiveShadow>
+        <sphereGeometry args={[1, 64, 64]} />
         <meshPhysicalMaterial 
           color="#6b8c68" 
           transmission={0.4} 
@@ -41,8 +41,8 @@ const ZenStones = () => {
       </mesh>
 
       {/* Top Stone (Wet Charcoal) */}
-      <mesh position={[-0.1, 0.9, 0]} rotation={[0.2, -0.2, 0.1]} scale={[0.7, 0.4, 0.6]}>
-        <sphereGeometry args={[1, 32, 16]} />
+      <mesh position={[-0.1, 0.9, 0]} rotation={[0.2, -0.2, 0.1]} scale={[0.7, 0.4, 0.6]} castShadow receiveShadow>
+        <sphereGeometry args={[1, 64, 64]} />
         <meshStandardMaterial 
           color="#202326" 
           roughness={0.85} 
@@ -87,9 +87,10 @@ export default function CanvasBackground() {
     <div className="fixed inset-0 z-[-10]">
       <Canvas 
         camera={{ position: [0, 0, 7], fov: 45 }} 
-        dpr={[1, 1.5]} 
+        dpr={[1, 2]} 
         performance={{ min: 0.5 }}
-        gl={{ antialias: false, stencil: false, depth: true, powerPreference: "high-performance" }}
+        gl={{ antialias: true, stencil: false, depth: true, powerPreference: "high-performance", toneMapping: THREE.ACESFilmicToneMapping }}
+        shadows
       >
         {/* Soft abstract environment, no heavy reflections */}
         <Environment preset="city" background={false} environmentIntensity={0.2} />
@@ -100,6 +101,8 @@ export default function CanvasBackground() {
           position={[10, 10, -5]}
           intensity={3}
           color="#fffaee"
+          castShadow
+          shadow-mapSize={[1024, 1024]}
         />
         <directionalLight
           position={[-5, 5, 5]}
@@ -132,10 +135,10 @@ export default function CanvasBackground() {
           frames={1} 
           position={[0, -2.49, 0]} 
           scale={20} 
-          blur={1.5} 
-          opacity={0.65} 
+          blur={2.5} 
+          opacity={0.7} 
           far={10} 
-          resolution={512} 
+          resolution={1024} 
           color="#1a2636" 
         />
       </Canvas>
