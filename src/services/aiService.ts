@@ -14,8 +14,8 @@ export const generateChatResponse = async (
 
   if (provider === 'gemini') {
     // Hardcode gemini-2.5-flash to override any deprecated models (e.g. 1.5) cached in user's localStorage
-    url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent`;
-    headers['x-goog-api-key'] = apiKey;
+    // Pass API key in URL to support the new 'AQ.' key format without header parsing issues
+    url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
     
     let geminiMessages = messages.map(m => ({ role: m.role === 'assistant' ? 'model' : 'user', parts: [{ text: m.content }] }));
     
