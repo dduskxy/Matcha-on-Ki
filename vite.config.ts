@@ -4,7 +4,7 @@ import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
-  base: './', // For GitHub Pages
+  base: '/Matcha-on-Ki/', // Explicitly set for GitHub Pages
   build: {
     rollupOptions: {
       output: {
