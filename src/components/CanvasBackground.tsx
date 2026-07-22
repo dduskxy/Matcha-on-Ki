@@ -110,7 +110,7 @@ export default function CanvasBackground() {
         />
         
         {/* Morning Mist Particles */}
-        <Sparkles count={80} scale={20} size={1.5} speed={0.4} opacity={0.6} color="#ffffff" />
+        <Sparkles count={100} scale={20} size={3} speed={0.4} opacity={0.9} color="#85b865" />
 
         {/* Fantasy Zen Bamboo Leaves */}
         <BambooLeaves count={60} />
