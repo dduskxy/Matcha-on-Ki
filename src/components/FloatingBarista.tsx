@@ -106,7 +106,12 @@ export default function FloatingBarista() {
         </div>
 
         {showSettings ? (
-          <div className="flex-grow p-6 overflow-y-auto bg-luxury-cream z-10">
+          <div 
+            className="flex-grow p-6 overflow-y-auto bg-luxury-cream z-10" 
+            data-lenis-prevent 
+            onWheel={(e) => e.stopPropagation()}
+            onTouchMove={(e) => e.stopPropagation()}
+          >
             <ApiKeyManager />
           </div>
         ) : (
@@ -114,6 +119,9 @@ export default function FloatingBarista() {
             <div 
               className="flex-grow p-6 overflow-y-auto overscroll-contain bg-transparent z-10 custom-scrollbar" 
               ref={scrollRef} 
+              data-lenis-prevent
+              onWheel={(e) => e.stopPropagation()}
+              onTouchMove={(e) => e.stopPropagation()}
             >
               <div className="flex justify-center pb-6">
                 <button onClick={() => clearChat()} className="text-[9px] tracking-[0.3em] uppercase text-luxury-charcoal/30 hover:text-luxury-charcoal transition border-b border-transparent hover:border-luxury-charcoal pb-1">
