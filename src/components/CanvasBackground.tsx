@@ -1,7 +1,7 @@
 import { useRef } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 
-import { OrbitControls, Sparkles, ContactShadows } from '@react-three/drei';
+import { OrbitControls, Sparkles } from '@react-three/drei';
 import * as THREE from 'three';
 import BambooLeaves from './BambooLeaves';
 
@@ -18,41 +18,32 @@ const ZenStones = () => {
   return (
     <group ref={groupRef} position={[0, -0.5, 0]} scale={1.3}>
       {/* Bottom Stone (Deep Walnut Wood/Earth - "Ki" Element) */}
-      <mesh position={[0, -0.9, 0]} rotation={[0.05, 0.4, -0.05]} scale={[1.9, 0.4, 1.8]} castShadow receiveShadow>
-        <sphereGeometry args={[1, 48, 48]} />
-        <meshPhysicalMaterial 
+      <mesh position={[0, -0.9, 0]} rotation={[0.05, 0.4, -0.05]} scale={[1.9, 0.4, 1.8]}>
+        <sphereGeometry args={[1, 32, 32]} />
+        <meshStandardMaterial 
           color="#2c1e16" 
-          roughness={0.85} 
-          metalness={0.05}
-          clearcoat={0.1}
-          clearcoatRoughness={0.8}
+          roughness={0.9} 
+          metalness={0.0}
         />
       </mesh>
       
       {/* Middle Stone (Wabi-Sabi Ceramic Chawan - "Tea Bowl" Element) */}
-      <mesh position={[0.1, -0.3, 0.05]} rotation={[-0.1, -0.2, 0.1]} scale={[1.2, 0.35, 1.1]} castShadow receiveShadow>
-        <sphereGeometry args={[1, 48, 48]} />
-        <meshPhysicalMaterial 
+      <mesh position={[0.1, -0.3, 0.05]} rotation={[-0.1, -0.2, 0.1]} scale={[1.2, 0.35, 1.1]}>
+        <sphereGeometry args={[1, 32, 32]} />
+        <meshStandardMaterial 
           color="#e8e3d9" 
           roughness={0.3} 
-          metalness={0.0}
-          clearcoat={0.4}
-          clearcoatRoughness={0.2}
+          metalness={0.1}
         />
       </mesh>
 
       {/* Top Stone (Ceremonial Matcha Gem - "Matcha" Element) */}
-      <mesh position={[-0.05, 0.15, -0.05]} rotation={[0.15, 0.6, -0.15]} scale={[0.6, 0.25, 0.5]} castShadow receiveShadow>
-        <sphereGeometry args={[1, 48, 48]} />
-        <meshPhysicalMaterial 
+      <mesh position={[-0.05, 0.15, -0.05]} rotation={[0.15, 0.6, -0.15]} scale={[0.6, 0.25, 0.5]}>
+        <sphereGeometry args={[1, 32, 32]} />
+        <meshStandardMaterial 
           color="#4a7a3a"
           roughness={0.1}
-          metalness={0.0}
-          transmission={0.8}
-          ior={1.5}
-          thickness={1.0}
-          clearcoat={1.0}
-          clearcoatRoughness={0.05}
+          metalness={0.2}
         />
       </mesh>
     </group>
@@ -93,10 +84,9 @@ export default function CanvasBackground() {
     <div className="fixed inset-0 z-[-10]">
       <Canvas 
         camera={{ position: [0, 0, 7], fov: 45 }} 
-        dpr={[1, 1.5]} 
+        dpr={1} 
         performance={{ min: 0.5 }}
-        gl={{ antialias: true, stencil: false, depth: true, powerPreference: "high-performance", toneMapping: THREE.ACESFilmicToneMapping }}
-        shadows
+        gl={{ antialias: true, stencil: false, depth: true, powerPreference: "high-performance" }}
       >
         <fog attach="fog" args={['#ffffff', 5, 20]} />
         
@@ -110,9 +100,6 @@ export default function CanvasBackground() {
           position={[6, 12, -4]}
           intensity={2.5}
           color="#ffffff"
-          castShadow
-          shadow-mapSize={[512, 512]}
-          shadow-bias={-0.0001}
         />
         
         {/* Fill Light (Soft daylight) */}
@@ -131,7 +118,7 @@ export default function CanvasBackground() {
         
         {/* Magical Ceremonial Matcha Dust (Golden/Green Mist) */}
         <Sparkles 
-          count={60} 
+          count={35} 
           scale={12} 
           size={4} 
           speed={0.2} 
@@ -139,33 +126,25 @@ export default function CanvasBackground() {
           noise={0.2}
           color="#fceea7" 
         />        {/* Fantasy Zen Bamboo Leaves */}
-        <BambooLeaves count={25} />
+        <BambooLeaves count={20} />
 
         <OrbitControls 
           enableZoom={false}
           enablePan={false}
-          minPolarAngle={Math.PI / 2 - 0.2}
-          maxPolarAngle={Math.PI / 2 + 0.2}
-          minAzimuthAngle={-0.5}
-          maxAzimuthAngle={0.5}
-          enableDamping={true}
-          dampingFactor={0.05}
+          maxPolarAngle={Math.PI / 2}
+          minPolarAngle={Math.PI / 3}
+          autoRotate
+          autoRotateSpeed={0.5}
         />
         
         <ZenStones />
         <ZenRipple />
         
-        {/* Cinematic Contact Shadows (Baked ONCE for zero lag) */}
-        <ContactShadows 
-          frames={1} 
-          position={[0, -2.49, 0]} 
-          scale={15} 
-          blur={2.5} 
-          opacity={0.65} 
-          far={10} 
-          resolution={512} 
-          color="#16201a" 
-        />
+        {/* Fake Shadow (Extremely Fast, Zero Lag) */}
+        <mesh position={[0, -2.49, 0]} rotation={[-Math.PI / 2, 0, 0]} scale={[3.5, 3.5, 1]}>
+          <circleGeometry args={[1, 32]} />
+          <meshBasicMaterial color="#0a1210" transparent opacity={0.2} />
+        </mesh>
       </Canvas>
     </div>
   );
