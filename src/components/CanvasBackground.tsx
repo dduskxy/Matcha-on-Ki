@@ -1,7 +1,7 @@
 import { useRef } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 
-import { OrbitControls, Sparkles } from '@react-three/drei';
+import { OrbitControls, Sparkles, ContactShadows } from '@react-three/drei';
 import * as THREE from 'three';
 import BambooLeaves from './BambooLeaves';
 
@@ -131,20 +131,22 @@ export default function CanvasBackground() {
         <OrbitControls 
           enableZoom={false}
           enablePan={false}
-          maxPolarAngle={Math.PI / 2}
-          minPolarAngle={Math.PI / 3}
-          autoRotate
-          autoRotateSpeed={0.5}
         />
         
         <ZenStones />
         <ZenRipple />
         
-        {/* Fake Shadow (Extremely Fast, Zero Lag) */}
-        <mesh position={[0, -2.49, 0]} rotation={[-Math.PI / 2, 0, 0]} scale={[3.5, 3.5, 1]}>
-          <circleGeometry args={[1, 32]} />
-          <meshBasicMaterial color="#0a1210" transparent opacity={0.2} />
-        </mesh>
+        {/* Beautiful Soft Shadow (Baked on Frame 1 for Zero Runtime Lag) */}
+        <ContactShadows 
+          frames={1} 
+          position={[0, -2.49, 0]} 
+          scale={15} 
+          blur={2.5} 
+          opacity={0.6} 
+          far={10} 
+          resolution={256} 
+          color="#16201a" 
+        />
       </Canvas>
     </div>
   );
