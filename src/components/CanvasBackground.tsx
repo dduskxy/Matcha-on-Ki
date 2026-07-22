@@ -89,29 +89,28 @@ export default function CanvasBackground() {
         gl={{ antialias: true, stencil: false, depth: true, powerPreference: "high-performance", toneMapping: THREE.ACESFilmicToneMapping }}
         shadows
       >
-        <color attach="background" args={['#0d140f']} />
-        <fog attach="fog" args={['#0d140f', 5, 20]} />
+        <fog attach="fog" args={['#ffffff', 5, 20]} />
         
         {/* Soft abstract environment, no heavy reflections */}
         <Environment preset="city" background={false} environmentIntensity={0.2} />
         
-        {/* Sunlight breaking through canopy */}
-        <ambientLight intensity={0.5} color="#1a2e20" />
+        {/* Clean Daylight */}
+        <ambientLight intensity={0.5} color="#e6f2ff" />
         <directionalLight
           position={[10, 15, -5]}
           intensity={3}
-          color="#d0f2d9"
+          color="#fffaee"
           castShadow
           shadow-mapSize={[1024, 1024]}
         />
         <directionalLight
           position={[-5, 5, 5]}
           intensity={1}
-          color="#1e3626"
+          color="#aaccff"
         />
         
-        {/* Fireflies / Magic Dust */}
-        <Sparkles count={80} scale={20} size={1.5} speed={0.4} opacity={0.6} color="#c2f0a8" />
+        {/* Morning Mist Particles */}
+        <Sparkles count={80} scale={20} size={1.5} speed={0.4} opacity={0.6} color="#ffffff" />
 
         {/* Fantasy Zen Bamboo Leaves */}
         <BambooLeaves count={60} />
