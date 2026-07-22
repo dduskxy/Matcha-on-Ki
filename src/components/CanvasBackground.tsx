@@ -97,7 +97,6 @@ export default function CanvasBackground() {
           rotation={[0, 0, 0]} 
           polar={[-0.2, 0.2]} 
           azimuth={[-0.5, 0.5]} 
-          config={{ mass: 2, tension: 400 }} 
           snap={true}
         >
           <ZenStones />
