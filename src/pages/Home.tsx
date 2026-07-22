@@ -33,9 +33,9 @@ export default function Home() {
           transition={{ duration: 1.2, ease: [0.2, 0.8, 0.2, 1] }}
           className="relative z-10 w-full"
         >
-          <span className="font-sans text-[10px] md:text-xs tracking-[0.4em] uppercase text-luxury-charcoal font-medium mb-10 block drop-shadow-[0_0_10px_rgba(252,251,248,1)]">The Art of Stillness</span>
+          <span className="font-sans text-[10px] md:text-xs tracking-[0.5em] uppercase text-white mix-blend-difference font-light mb-10 block">The Art of Stillness</span>
           
-          <h1 className="text-5xl md:text-7xl lg:text-8xl font-serif mb-12 text-luxury-charcoal leading-[1.1] tracking-wide relative flex flex-col items-center drop-shadow-[0_0_20px_rgba(252,251,248,0.9)]">
+          <h1 className="text-5xl md:text-7xl lg:text-8xl font-serif mb-12 text-white mix-blend-difference leading-[1.1] tracking-wide relative flex flex-col items-center">
             <span className="overflow-hidden block pb-2">
               <motion.span 
                 initial={{ y: "110%", rotate: 2, opacity: 0 }}
@@ -58,23 +58,23 @@ export default function Home() {
             </span>
           </h1>
           
-          <p className="max-w-xl mx-auto text-sm md:text-base text-luxury-charcoal font-medium leading-relaxed mb-16 relative drop-shadow-[0_0_15px_rgba(252,251,248,1)]">
-            <span className="absolute -left-6 top-2 w-4 h-[1.5px] bg-luxury-charcoal hidden md:block"></span>
-            <span className="absolute -right-6 top-2 w-4 h-[1.5px] bg-luxury-charcoal hidden md:block"></span>
+          <p className="max-w-xl mx-auto text-sm md:text-base text-white mix-blend-difference font-light leading-loose mb-16 relative">
+            <span className="absolute -left-6 top-3 w-4 h-[1px] bg-white hidden md:block opacity-40"></span>
+            <span className="absolute -right-6 top-3 w-4 h-[1px] bg-white hidden md:block opacity-40"></span>
             A sanctuary where the ancient tradition of Uji matcha meets contemporary stillness. We embrace the beauty of negative space, allowing every drop to be measured in time.
           </p>
 
           <Magnetic strength={20}>
-            <Link to="/menu" className="group inline-flex items-center gap-4 border-b border-luxury-charcoal pb-2 hover:border-luxury-matcha hover:text-luxury-matcha transition-all duration-500 font-medium drop-shadow-[0_0_10px_rgba(252,251,248,1)]">
-              <span className="text-xs tracking-[0.2em] uppercase font-bold">Explore the Menu</span>
-              <span className="group-hover:translate-x-2 transition-transform duration-500">→</span>
+            <Link to="/menu" className="group inline-flex items-center gap-4 border-b border-white/40 pb-2 hover:border-white transition-all duration-700 text-white mix-blend-difference">
+              <span className="text-[10px] tracking-[0.3em] uppercase font-light">Explore the Menu</span>
+              <span className="group-hover:translate-x-2 transition-transform duration-700 opacity-60">→</span>
             </Link>
           </Magnetic>
         </motion.div>
       </div>
 
       {/* Floating Corner Details */}
-      <div className="absolute bottom-10 left-6 md:left-12 text-[9px] tracking-[0.3em] uppercase text-luxury-charcoal font-medium hidden md:block writing-vertical-lr rotate-180 drop-shadow-[0_0_8px_rgba(252,251,248,1)]">
+      <div className="absolute bottom-10 left-6 md:left-12 text-[9px] tracking-[0.3em] uppercase text-white mix-blend-difference font-light hidden md:block writing-vertical-lr rotate-180 opacity-60">
         Est. 2026 — Kyoto / BKK
       </div>
 
@@ -83,13 +83,13 @@ export default function Home() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1, duration: 1 }}
-        className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3 z-10 drop-shadow-[0_0_15px_rgba(252,251,248,1)]"
+        className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-4 z-10 text-white mix-blend-difference opacity-70"
       >
-        <span className="text-[10px] tracking-[0.3em] uppercase text-luxury-charcoal font-bold">Scroll</span>
+        <span className="text-[9px] tracking-[0.4em] uppercase font-light">Scroll</span>
         <motion.div 
           animate={{ y: [0, 10, 0] }} 
           transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
-          className="w-[2px] h-14 bg-gradient-to-b from-luxury-charcoal to-transparent"
+          className="w-[1px] h-12 bg-gradient-to-b from-white to-transparent"
         ></motion.div>
       </motion.div>
 
