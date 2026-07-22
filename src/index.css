@@ -1,0 +1,26 @@
+@import "tailwindcss";
+
+@theme {
+  --color-luxury-cream: #FCFBF8;
+  --color-luxury-charcoal: #0F110C;
+  --color-luxury-matcha: #36592C;
+  --color-luxury-sand: #F0EEE7;
+  --color-luxury-stone: #D1CFC8;
+  
+  --font-sans: 'Inter', 'Noto Sans JP', sans-serif;
+  --font-serif: 'Cormorant Garamond', 'Noto Serif JP', serif;
+}
+
+@layer base {
+  body {
+    @apply bg-luxury-cream text-luxury-charcoal font-sans antialiased overflow-x-hidden;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-serif tracking-wide;
+  }
+}
+
+/* Scrollbar Hide */
+.hide-scrollbar::-webkit-scrollbar { display: none; }
+.hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }

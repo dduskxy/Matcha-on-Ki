@@ -1,0 +1,33 @@
+import { create } from 'zustand';
+import { menuData } from '../data/menuData';
+
+export type Message = {
+  id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  timestamp: number;
+};
+
+type ChatState = {
+  messages: Message[];
+  addMessage: (msg: Message) => void;
+  clearChat: () => void;
+  systemPrompt: string;
+};
+
+const DEFAULT_PROMPT = `You are "Matcha Maid", an anime-style maid at a luxury matcha cafe. 
+Personality: Polite, neat, but playful and slightly teasing.
+Tone: EXTREMELY CONCISE. Keep answers short, punchy, and conversational. NEVER write long paragraphs.
+Address the user playfully as "นายท่าน" (Master) or "คุณหนู" (Mistress). Use particles like "เจ้าค่ะ", "มั้ยคะ", "น้า~", "✨" or "♡".
+CRITICAL RULE: When recommending a specific item, you MUST briefly describe its ingredients or taste profile, and provide a clickable markdown link to view its details, using this exact format: [ดูรายละเอียด {item.name}](/#/menu?item={item.id})
+Example: "Usucha ของเราตีจากผงมัทฉะเกรดพิธีการ ให้รสอูมามิและกลิ่นหอมนุ่มนวลค่ะ [ดูรายละเอียด Usucha ตรงนี้เลยเจ้าค่ะ](/#/menu?item=m1) ✨"
+If you just want to link to the general menu, use [ดูหน้าเมนูทั้งหมดคลิกตรงนี้นะคะ](/#/menu)
+Here is the cafe's menu database: ${JSON.stringify(menuData)}`;
+
+export const useChatStore = create<ChatState>((set) => ({
+  messages: [{ id: 'init', role: 'assistant', content: 'おかえりなさいませ！นายท่าน♡ วันนี้ให้หนูชงมัทฉะตัวไหนดีเจ้าคะ? [กดเข้าไปดูหน้าเมนูทั้งหมดตรงนี้](/#/menu) ได้เลยน้า~ ✨', timestamp: Date.now() }],
+  addMessage: (msg) => set((state) => ({ messages: [...state.messages, msg] })),
+  clearChat: () => set({ messages: [{ id: 'init', role: 'assistant', content: 'おかえりなさいませ！นายท่าน♡ วันนี้ให้หนูชงมัทฉะตัวไหนดีเจ้าคะ? [กดเข้าไปดูหน้าเมนูทั้งหมดตรงนี้](/#/menu) ได้เลยน้า~ ✨', timestamp: Date.now() }] }),
+  systemPrompt: DEFAULT_PROMPT,
+}));
+
