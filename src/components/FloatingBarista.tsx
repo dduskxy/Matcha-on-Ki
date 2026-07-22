@@ -62,8 +62,9 @@ export default function FloatingBarista() {
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-            className={`mb-6 w-[350px] md:w-[400px] h-[550px] bg-luxury-cream/90 backdrop-blur-xl border border-luxury-charcoal/5 shadow-[0_30px_60px_rgba(0,0,0,0.1)] rounded-2xl flex flex-col overflow-hidden text-luxury-charcoal absolute bottom-full ${isCartOpen ? 'left-0 origin-bottom-left' : 'right-0 origin-bottom-right'}`}
+            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+            style={{ willChange: "transform, opacity" }}
+            className={`mb-6 w-[350px] md:w-[400px] h-[550px] bg-luxury-cream/98 border border-luxury-charcoal/5 shadow-[0_30px_60px_rgba(0,0,0,0.15)] rounded-2xl flex flex-col overflow-hidden text-luxury-charcoal absolute bottom-full ${isCartOpen ? 'left-0 origin-bottom-left' : 'right-0 origin-bottom-right'}`}
           >
             {/* Minimal Header */}
             <div className="bg-transparent px-6 py-5 flex justify-between items-center z-10">
@@ -102,7 +103,7 @@ export default function FloatingBarista() {
                       <div className="text-[9px] font-medium mb-2 tracking-[0.1em] uppercase text-luxury-charcoal/40">
                         {m.role === 'user' ? 'Master' : 'Maid'}
                       </div>
-                      <div className={`p-4 text-sm font-light leading-relaxed shadow-sm backdrop-blur-md ${m.role === 'user' ? 'bg-luxury-charcoal text-luxury-cream rounded-bl-2xl rounded-tl-2xl rounded-tr-2xl' : 'bg-white/60 border border-luxury-charcoal/5 rounded-br-2xl rounded-tr-2xl rounded-tl-2xl'}`}>
+                      <div className={`p-4 text-sm font-light leading-relaxed shadow-sm ${m.role === 'user' ? 'bg-luxury-charcoal text-luxury-cream rounded-bl-2xl rounded-tl-2xl rounded-tr-2xl' : 'bg-white/90 border border-luxury-charcoal/5 rounded-br-2xl rounded-tr-2xl rounded-tl-2xl'}`}>
                         <div className="prose prose-sm max-w-none prose-p:leading-relaxed">
                           <ReactMarkdown
                             components={{
@@ -178,14 +179,14 @@ export default function FloatingBarista() {
               initial={{ opacity: 0, x: isCartOpen ? -20 : 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: isCartOpen ? -10 : 10 }}
-              className={`absolute mr-6 bg-luxury-cream/90 backdrop-blur-md border border-luxury-charcoal/10 py-3 px-5 shadow-lg whitespace-nowrap hidden md:block rounded-xl ${isCartOpen ? 'left-full ml-6' : 'right-full mr-6'}`}
+              className={`absolute mr-6 bg-luxury-cream/95 border border-luxury-charcoal/10 py-3 px-5 shadow-lg whitespace-nowrap hidden md:block rounded-xl ${isCartOpen ? 'left-full ml-6' : 'right-full mr-6'}`}
             >
               <div className="text-xs font-light text-luxury-charcoal tracking-wide flex items-center gap-3">
                 <span className="w-1 h-1 bg-luxury-matcha rounded-full animate-pulse"></span>
                 おかえりなさいませ! Welcome back, Master.
               </div>
               {/* Arrow pointer */}
-              <div className={`absolute top-1/2 -translate-y-1/2 w-3 h-3 bg-luxury-cream/90 backdrop-blur-md border-luxury-charcoal/10 rotate-45 ${isCartOpen ? '-left-1.5 border-b border-l' : '-right-1.5 border-t border-r'}`}></div>
+              <div className={`absolute top-1/2 -translate-y-1/2 w-3 h-3 bg-luxury-cream/95 border-luxury-charcoal/10 rotate-45 ${isCartOpen ? '-left-1.5 border-b border-l' : '-right-1.5 border-t border-r'}`}></div>
             </motion.div>
           )}
         </AnimatePresence>
