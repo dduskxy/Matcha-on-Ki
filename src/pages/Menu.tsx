@@ -106,7 +106,8 @@ export default function Menu() {
         </div>
 
         {/* Ultra Minimal Grid List with Staggered Entrance */}
-        <AnimatePresence mode="wait">
+        <div className="min-h-[60vh]">
+          <AnimatePresence mode="wait">
           <motion.div 
             key={activeCategory}
             variants={containerVariants}
@@ -143,7 +144,8 @@ export default function Menu() {
               </motion.div>
             ))}
           </motion.div>
-        </AnimatePresence>
+          </AnimatePresence>
+        </div>
 
       </div>
 

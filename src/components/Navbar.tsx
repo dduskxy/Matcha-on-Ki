@@ -36,6 +36,7 @@ export default function Navbar() {
           <Magnetic strength={30}>
             <button 
               onClick={toggleCart} 
+              aria-label="Toggle Cart"
               className="flex items-center gap-2 hover:text-luxury-charcoal transition-colors duration-500 group relative p-2"
             >
               <span>Cart</span>

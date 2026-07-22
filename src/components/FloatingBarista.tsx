@@ -13,14 +13,15 @@ export default function FloatingBarista() {
   const [showSettings, setShowSettings] = useState(false);
   
   const { messages, addMessage, clearChat, systemPrompt } = useChatStore();
-  const { apiKeys, selectedProvider } = useSettingsStore();
-  const { addItem } = useCartStore();
+  const { apiKeys, selectedProvider, selectedModel } = useSettingsStore();
+  const addItem = useCartStore((state) => state.addItem); // Atomic selector to prevent global re-renders
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
-  // Auto-scroll to bottom
+  // Auto-scroll to bottom (only when messages length or loading state changes)
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTo({
@@ -28,10 +29,24 @@ export default function FloatingBarista() {
         behavior: 'smooth'
       });
     }
-  }, [messages, isLoading, isOpen, showSettings]);
+  }, [messages.length, isLoading]);
+  
+  // Cleanup AbortController on unmount
+  useEffect(() => {
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
+  }, []);
 
   const handleSend = async () => {
     if (!input.trim() || !apiKeys[selectedProvider] || isLoading) return;
+    
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    abortControllerRef.current = new AbortController();
     
     const userText = input;
     setInput('');
@@ -40,9 +55,17 @@ export default function FloatingBarista() {
 
     try {
       const history = messages.map(m => ({ role: m.role, content: m.content })).concat({ role: 'user', content: userText });
-      const responseText = await generateChatResponse(history, systemPrompt);
+      const responseText = await generateChatResponse(
+        history, 
+        systemPrompt,
+        apiKeys[selectedProvider],
+        selectedProvider,
+        selectedModel,
+        abortControllerRef.current.signal
+      );
       addMessage({ id: (Date.now()+1).toString(), role: 'assistant', content: responseText, timestamp: Date.now() });
     } catch (error: any) {
+      if (error.name === 'AbortError') return;
       addMessage({ id: (Date.now()+1).toString(), role: 'assistant', content: `Error: ${error.message}`, timestamp: Date.now() });
     } finally {
       setIsLoading(false);
@@ -129,7 +152,7 @@ export default function FloatingBarista() {
             {/* Scrollable Chat Area */}
             {/* IMPORTANT: Added onWheel={(e) => e.stopPropagation()} to physically block Lenis or any parent scroller from hijacking this div */}
             <div 
-              className="flex-grow p-6 overflow-y-auto bg-transparent z-10" 
+              className="flex-grow p-6 overflow-y-auto bg-transparent z-10 custom-scrollbar" 
               ref={scrollRef} 
               onWheel={(e) => e.stopPropagation()}
               onTouchMove={(e) => e.stopPropagation()}
@@ -160,7 +183,7 @@ export default function FloatingBarista() {
 
             {/* Input Area */}
             <div className="p-4 bg-white/50 border-t border-luxury-charcoal/10 z-10">
-              <div className="flex gap-4 border border-luxury-charcoal/20 focus-within:border-luxury-matcha transition-colors rounded-full px-4 py-2 bg-white">
+              <div className="flex gap-4 border border-luxury-charcoal/20 focus-within:border-luxury-matcha transition-colors rounded-full px-5 py-3 bg-white shadow-sm">
                 <input 
                   type="text" 
                   ref={inputRef}
