@@ -13,8 +13,8 @@ export const generateChatResponse = async (
   let headers: any = { 'Content-Type': 'application/json' };
 
   if (provider === 'gemini') {
-    // Hardcode gemini-3.6-flash to override any deprecated models (e.g. 1.5/2.5) cached in user's localStorage
-    url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey.trim()}`;
+    // Hardcode gemini-flash-latest to use the official auto-updating alias which supports the AQ. keys
+    url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${apiKey.trim()}`;
     headers['x-goog-api-key'] = apiKey.trim();
     
     let geminiMessages = messages.map(m => ({ role: m.role === 'assistant' ? 'model' : 'user', parts: [{ text: m.content }] }));

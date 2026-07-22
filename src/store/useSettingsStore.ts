@@ -23,7 +23,7 @@ export const useSettingsStore = create<SettingsState>()(
       deleteApiKey: (provider) => set((state) => ({ apiKeys: { ...state.apiKeys, [provider]: '' } })),
       selectedProvider: 'gemini',
       setSelectedProvider: (provider) => set({ selectedProvider: provider }),
-      selectedModel: 'gemini-3.6-flash',
+      selectedModel: 'gemini-flash-latest',
       setSelectedModel: (model) => set({ selectedModel: model }),
     }),
     { name: 'cafe-settings' }
