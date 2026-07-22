@@ -127,10 +127,10 @@ export default function FloatingBarista() {
                     {m.role === 'user' ? 'Master' : 'Maid'}
                   </div>
                   <div className={`p-4 text-sm font-light leading-relaxed shadow-sm ${m.role === 'user' ? 'bg-luxury-charcoal text-luxury-cream rounded-bl-2xl rounded-tl-2xl rounded-tr-2xl' : 'bg-white/95 border border-luxury-charcoal/10 rounded-br-2xl rounded-tr-2xl rounded-tl-2xl'}`}>
-                    <ReactMarkdown 
-                      className="prose prose-sm max-w-none prose-p:leading-relaxed"
-                      components={{
-                        a: ({node, ...props}) => {
+                    <div className="prose prose-sm max-w-none prose-p:leading-relaxed">
+                      <ReactMarkdown 
+                        components={{
+                        a: ({node, ...props}: any) => {
                           return (
                             <a 
                               {...props}
@@ -165,6 +165,7 @@ export default function FloatingBarista() {
                     >
                       {m.content}
                     </ReactMarkdown>
+                    </div>
                   </div>
                 </div>
               ))}

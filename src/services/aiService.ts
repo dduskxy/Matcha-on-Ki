@@ -20,10 +20,9 @@ export const generateChatResponse = async (
       contents: messages.map(m => ({ role: m.role === 'assistant' ? 'model' : 'user', parts: [{ text: m.content }] })),
       systemInstruction: { parts: [{ text: systemPrompt }] }
     };
-  } else if (selectedProvider === 'groq') {
+  } else if (provider === 'groq') {
     url = 'https://api.groq.com/openai/v1/chat/completions';
     headers['Authorization'] = `Bearer ${apiKey}`;
-    payload = { model: selectedModel, messages: [{ role: 'system', content: systemPrompt }, ...messages] };
     payload = { model: model, messages: [{ role: 'system', content: systemPrompt }, ...messages] };
   } else if (provider === 'openrouter') {
     url = 'https://openrouter.ai/api/v1/chat/completions';

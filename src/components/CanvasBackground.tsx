@@ -1,6 +1,6 @@
-import { useRef, useMemo } from 'react';
+import { useRef } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { motion } from 'framer-motion';
+
 import { OrbitControls, Sparkles, ContactShadows, Environment } from '@react-three/drei';
 import * as THREE from 'three';
 import BambooLeaves from './BambooLeaves';
@@ -100,7 +100,6 @@ export default function CanvasBackground() {
         dpr={[1, 1.5]} 
         performance={{ min: 0.5 }}
         gl={{ antialias: false, stencil: false, depth: true, powerPreference: "high-performance" }}
-        raycaster={{ enabled: false }}
       >
         {/* Environment HDRI for realistic reflections (crucial for clearcoat and glass) */}
         <Environment preset="park" background={false} />
