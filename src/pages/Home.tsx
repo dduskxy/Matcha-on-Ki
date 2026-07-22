@@ -7,8 +7,8 @@ export default function Home() {
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      transition={{ duration: 0.8, ease: [0.2, 0.8, 0.2, 1] }}
+      exit={{ opacity: 0, y: -20, transition: { duration: 0.3 } }}
+      transition={{ duration: 1.2, ease: [0.2, 0.8, 0.2, 1] }}
       className="min-h-screen pt-32 pb-20 selection:bg-luxury-matcha selection:text-white relative overflow-hidden"
     >
       
