@@ -16,6 +16,12 @@
     @apply bg-luxury-cream text-luxury-charcoal font-sans antialiased overflow-x-hidden;
   }
   
+  @media (pointer: fine) {
+    body, a, button, input {
+      cursor: none !important;
+    }
+  }
+  
   h1, h2, h3, h4, h5, h6 {
     @apply font-serif tracking-wide;
   }

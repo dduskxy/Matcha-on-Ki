@@ -11,11 +11,15 @@ import CanvasBackground from './components/CanvasBackground';
 import FloatingBarista from './components/FloatingBarista';
 import CartDrawer from './components/CartDrawer';
 import BambooLeaves from './components/BambooLeaves';
+import CustomCursor from './components/CustomCursor';
+import Preloader from './components/Preloader';
 
 function AppContent() {
   const location = useLocation();
   return (
-    <div className="relative min-h-screen bg-dark-bg text-gray-200 selection:bg-cyber-matcha selection:text-black">
+    <div className="relative min-h-screen selection:bg-cyber-matcha selection:text-black">
+      <Preloader />
+      <CustomCursor />
       <CanvasBackground />
       <BambooLeaves />
       <Navbar />

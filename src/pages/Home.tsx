@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import Magnetic from '../components/Magnetic';
 
 export default function Home() {
   return (
@@ -63,10 +64,12 @@ export default function Home() {
             A sanctuary where the ancient tradition of Uji matcha meets contemporary stillness. We embrace the beauty of negative space, allowing every drop to be measured in time.
           </p>
 
-          <Link to="/menu" className="group inline-flex items-center gap-4 border-b border-luxury-charcoal pb-2 hover:border-luxury-matcha hover:text-luxury-matcha transition-all duration-500 font-medium drop-shadow-[0_0_10px_rgba(252,251,248,1)]">
-            <span className="text-xs tracking-[0.2em] uppercase font-bold">Explore the Menu</span>
-            <span className="group-hover:translate-x-2 transition-transform duration-500">→</span>
-          </Link>
+          <Magnetic strength={20}>
+            <Link to="/menu" className="group inline-flex items-center gap-4 border-b border-luxury-charcoal pb-2 hover:border-luxury-matcha hover:text-luxury-matcha transition-all duration-500 font-medium drop-shadow-[0_0_10px_rgba(252,251,248,1)]">
+              <span className="text-xs tracking-[0.2em] uppercase font-bold">Explore the Menu</span>
+              <span className="group-hover:translate-x-2 transition-transform duration-500">→</span>
+            </Link>
+          </Magnetic>
         </motion.div>
       </div>
 
