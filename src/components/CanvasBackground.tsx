@@ -1,7 +1,7 @@
-import { useRef } from 'react';
+import { useRef, useMemo } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { motion } from 'framer-motion';
-import { Float, ContactShadows, Sparkles, OrbitControls } from '@react-three/drei';
+import { OrbitControls, Sparkles, ContactShadows, Environment } from '@react-three/drei';
 import * as THREE from 'three';
 import BambooLeaves from './BambooLeaves';
 
@@ -17,19 +17,47 @@ const ZenStones = () => {
 
   return (
     <group ref={groupRef} position={[0, -0.5, 0]} scale={1.4}>
+      {/* Bottom Stone (Wet Charcoal) */}
       <mesh position={[0, -0.6, 0]} rotation={[0.1, 0, -0.1]} scale={[1.8, 0.7, 1.6]}>
-        <sphereGeometry args={[1, 16, 12]} />
-        <meshStandardMaterial color="#1A1A1A" roughness={0.8} metalness={0.2} />
+        <sphereGeometry args={[1, 32, 16]} />
+        <meshPhysicalMaterial 
+          color="#1c1f22" 
+          roughness={0.2} 
+          metalness={0.1} 
+          clearcoat={1.0} 
+          clearcoatRoughness={0.05} 
+          ior={1.54} 
+        />
       </mesh>
       
+      {/* Middle Stone (Polished Jade / Matcha with subsurface scattering) */}
       <mesh position={[0.1, 0.3, 0.1]} rotation={[-0.2, 0.5, 0.2]} scale={[1.2, 0.5, 1.1]}>
-        <sphereGeometry args={[1, 16, 12]} />
-        <meshStandardMaterial color="#36592C" roughness={0.3} metalness={0.3} />
+        <sphereGeometry args={[1, 32, 16]} />
+        <meshPhysicalMaterial 
+          color="#5a7a58" 
+          transmission={0.85} 
+          thickness={1.2} 
+          roughness={0.15} 
+          metalness={0.0}
+          ior={1.66} 
+          clearcoat={1.0} 
+          clearcoatRoughness={0.08}
+          attenuationColor="#8bc34a" 
+          attenuationDistance={1.0} 
+        />
       </mesh>
 
+      {/* Top Stone (Wet Charcoal) */}
       <mesh position={[-0.1, 0.9, 0]} rotation={[0.2, -0.2, 0.1]} scale={[0.7, 0.4, 0.6]}>
-        <sphereGeometry args={[1, 16, 12]} />
-        <meshStandardMaterial color="#1A1A1A" roughness={0.7} metalness={0.2} />
+        <sphereGeometry args={[1, 32, 16]} />
+        <meshPhysicalMaterial 
+          color="#181a1c" 
+          roughness={0.25} 
+          metalness={0.12} 
+          clearcoat={1.0} 
+          clearcoatRoughness={0.06} 
+          ior={1.54} 
+        />
       </mesh>
     </group>
   );
@@ -74,10 +102,21 @@ export default function CanvasBackground() {
         gl={{ antialias: false, stencil: false, depth: true, powerPreference: "high-performance" }}
         raycaster={{ enabled: false }}
       >
+        {/* Environment HDRI for realistic reflections (crucial for clearcoat and glass) */}
+        <Environment preset="park" background={false} />
         
-        {/* Simplified Lighting */}
-        <ambientLight intensity={1.5} />
-        <directionalLight position={[10, 15, 10]} intensity={4} color="#FFFFFF" />
+        {/* Ultra-Realistic Procedural Lighting */}
+        <ambientLight intensity={0.4} color="#e6f2ff" />
+        <directionalLight
+          position={[10, 10, -5]}
+          intensity={3}
+          color="#fffaee"
+        />
+        <directionalLight
+          position={[-5, 5, 5]}
+          intensity={1}
+          color="#aaccff"
+        />
         
         {/* Minimal Particles */}
         <Sparkles count={20} scale={15} size={2} speed={0.2} opacity={0.5} color="#4A7A3A" />
@@ -99,11 +138,17 @@ export default function CanvasBackground() {
         <ZenStones />
         <ZenRipple />
         
-        {/* Ultra-Fast Fake Shadow instead of heavy ContactShadows */}
-        <mesh position={[0, -2.49, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-          <circleGeometry args={[2.5, 32]} />
-          <meshBasicMaterial color="#000000" transparent opacity={0.15} />
-        </mesh>
+        {/* Baked Contact Shadows - Fast but realistic */}
+        <ContactShadows 
+          frames={1} 
+          position={[0, -2.49, 0]} 
+          scale={20} 
+          blur={1.5} 
+          opacity={0.65} 
+          far={10} 
+          resolution={512} 
+          color="#1a2636" 
+        />
       </Canvas>
     </div>
   );
