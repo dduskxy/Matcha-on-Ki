@@ -10,7 +10,7 @@ export default function ApiKeyManager() {
   // Automatically lock to Gemini and the latest model on load
   useEffect(() => {
     setSelectedProvider('gemini');
-    setSelectedModel('gemini-2.5-flash');
+    setSelectedModel('gemini-3.6-flash');
   }, [setSelectedProvider, setSelectedModel]);
 
   const handleVerifyAndSave = async () => {
@@ -37,7 +37,7 @@ export default function ApiKeyManager() {
       </h3>
       
       <p className="text-xs text-luxury-charcoal/60 mb-6 font-light leading-relaxed">
-        Please provide your Google AI Studio or Gemini API key to activate the Tea Master AI. We automatically connect to the latest Gemini 2.5 Flash architecture.
+        Please provide your Google AI Studio or Gemini API key to activate the Tea Master AI. We automatically connect to the latest Gemini 3.6 Flash architecture.
       </p>
 
       <div className="mb-2">
