@@ -154,12 +154,14 @@ export default function Menu() {
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             className="fixed inset-0 z-50 flex items-center justify-center bg-luxury-cream/98 p-4" 
             onClick={() => setSelectedItem(null)}
+            data-lenis-prevent
           >
             <motion.div 
               initial={{ y: 30, opacity: 0, scale: 0.95 }} animate={{ y: 0, opacity: 1, scale: 1 }} exit={{ y: 20, opacity: 0, scale: 0.95 }}
               transition={{ duration: 0.6, ease: [0.2, 0.8, 0.2, 1] }}
               className="max-w-lg w-full flex flex-col items-center text-center" 
               onClick={e => e.stopPropagation()}
+              data-lenis-prevent
             >
               <div className="text-luxury-matcha mb-16 transform scale-150">
                 {renderIcon(selectedItem.icon)}

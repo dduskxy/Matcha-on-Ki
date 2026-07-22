@@ -90,7 +90,7 @@ export default function FloatingBarista() {
             ) : (
               <>
                 {/* Chat Area */}
-                <div className="flex-grow p-6 overflow-y-auto overscroll-contain bg-transparent z-10 custom-scrollbar" ref={scrollRef}>
+                <div className="flex-grow p-6 overflow-y-auto overscroll-contain bg-transparent z-10 custom-scrollbar" ref={scrollRef} data-lenis-prevent>
                   <div className="flex justify-center pb-6">
                     <button onClick={() => clearChat()} className="text-[9px] tracking-[0.3em] uppercase text-luxury-charcoal/20 hover:text-luxury-charcoal transition border-b border-transparent hover:border-luxury-charcoal pb-1">
                       Start Anew
@@ -108,22 +108,21 @@ export default function FloatingBarista() {
                             components={{
                               a: ({node, ...props}) => {
                                 return (
-                                  <button 
+                                  <a 
+                                    {...props}
                                     onClick={(e) => {
                                       e.preventDefault();
                                       const href = props.href || '';
                                       
                                       // 1. ADD TO CART
                                       if (href.includes('cart') || href.includes('add')) {
-                                        // Try to find the item ID (e.g. ?id=m1, ?item=m1, or just /m1)
                                         const match = href.match(/[?&](?:id|item)=([^&]+)/i) || href.match(/([mcst]\d)/i);
                                         const id = match ? match[1].toLowerCase() : null;
                                         const item = menuData.find(m => m.id.toLowerCase() === id);
                                         
                                         if (item) {
-                                          addItem(item);
+                                          useCartStore.getState().addItem(item);
                                         } else {
-                                          // Fallback if AI hallucinates wrong ID: just open the cart
                                           useCartStore.getState().toggleCart();
                                         }
                                       } 
@@ -131,7 +130,7 @@ export default function FloatingBarista() {
                                       else if (href.includes('menu')) {
                                         const hashUrl = href.startsWith('/#') ? href.substring(2) : href;
                                         navigate(hashUrl);
-                                        setIsOpen(false); // Close chatbot to view menu
+                                        setIsOpen(false);
                                       } 
                                       // 3. INTERNAL ROUTES
                                       else if (href.startsWith('/') || href.startsWith('#')) {
@@ -143,10 +142,10 @@ export default function FloatingBarista() {
                                         window.open(href, '_blank');
                                       }
                                     }}
-                                    className="text-luxury-matcha border-b border-luxury-matcha/30 hover:border-luxury-matcha transition-colors"
+                                    className="text-luxury-matcha border-b border-luxury-matcha/30 hover:border-luxury-matcha transition-colors cursor-pointer"
                                   >
                                     {props.children}
-                                  </button>
+                                  </a>
                                 );
                               }
                             }}

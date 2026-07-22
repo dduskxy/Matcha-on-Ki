@@ -22,8 +22,9 @@ export default function CartDrawer() {
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
-            transition={{ type: 'spring', bounce: 0, duration: 0.6 }}
+            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
             className="fixed top-0 right-0 h-full w-full md:w-[400px] bg-luxury-cream shadow-2xl z-[101] flex flex-col border-l border-luxury-charcoal/10"
+            data-lenis-prevent
           >
             <div className="p-6 border-b border-luxury-charcoal/10 flex justify-between items-center">
               <h2 className="font-serif text-2xl text-luxury-charcoal flex items-center gap-3">
