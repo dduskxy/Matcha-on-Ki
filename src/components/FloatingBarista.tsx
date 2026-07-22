@@ -63,7 +63,6 @@ export default function FloatingBarista() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-            style={{ willChange: "transform, opacity" }}
             className={`mb-6 w-[350px] md:w-[400px] h-[550px] bg-luxury-cream/98 border border-luxury-charcoal/5 shadow-[0_30px_60px_rgba(0,0,0,0.15)] rounded-2xl flex flex-col overflow-hidden text-luxury-charcoal absolute bottom-full ${isCartOpen ? 'left-0 origin-bottom-left' : 'right-0 origin-bottom-right'}`}
           >
             {/* Minimal Header */}
