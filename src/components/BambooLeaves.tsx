@@ -24,11 +24,56 @@ const createBambooLeafGeometry = () => {
   return geometry;
 };
 
-export default function BambooLeaves({ count = 35 }) {
-  const meshRef = useRef<THREE.InstancedMesh>(null);
-  
+const SingleLeaf = ({ leaf, geometry }: { leaf: any, geometry: THREE.BufferGeometry }) => {
+  const meshRef = useRef<THREE.Mesh>(null);
+
+  useFrame((state) => {
+    if (!meshRef.current) return;
+    const time = state.clock.getElapsedTime();
+
+    // falling down
+    leaf.y -= leaf.speed;
+    
+    // loop back to top when they fall past the floor
+    if (leaf.y < -12) {
+      leaf.y = 15;
+      leaf.x = (Math.random() - 0.5) * 25;
+    }
+
+    // swaying side to side gently in the wind
+    const sway = Math.sin(time * leaf.swaySpeed + leaf.swayPhase) * 0.02;
+    leaf.x += sway;
+    leaf.z += sway * 0.3;
+
+    // tumbling / rotating gently
+    leaf.rx += leaf.rs;
+    leaf.ry += leaf.rySpeed;
+    leaf.rz += leaf.rs;
+
+    meshRef.current.position.set(leaf.x, leaf.y, leaf.z);
+    meshRef.current.rotation.set(leaf.rx, leaf.ry, leaf.rz);
+    meshRef.current.scale.setScalar(leaf.scale);
+  });
+
+  return (
+    <mesh ref={meshRef} geometry={geometry}>
+      <meshStandardMaterial 
+        color="#36592C"
+        emissive="#6BB352"
+        emissiveIntensity={0.25}
+        roughness={0.35}
+        metalness={0.15}
+        transparent={true}
+        opacity={0.82}
+        side={THREE.DoubleSide}
+        depthWrite={false}
+      />
+    </mesh>
+  );
+};
+
+export default function BambooLeaves({ count = 15 }) {
   const leafGeometry = useMemo(() => createBambooLeafGeometry(), []);
-  const dummy = useMemo(() => new THREE.Object3D(), []);
   
   const leaves = useMemo(() => {
     return new Array(count).fill(0).map(() => ({
@@ -47,54 +92,11 @@ export default function BambooLeaves({ count = 35 }) {
     }));
   }, [count]);
 
-  useFrame((state) => {
-    if (!meshRef.current) return;
-    const time = state.clock.getElapsedTime();
-
-    leaves.forEach((leaf, i) => {
-      // falling down
-      leaf.y -= leaf.speed;
-      
-      // loop back to top when they fall past the floor
-      if (leaf.y < -12) {
-        leaf.y = 15;
-        leaf.x = (Math.random() - 0.5) * 25;
-      }
-
-      // swaying side to side gently in the wind
-      const sway = Math.sin(time * leaf.swaySpeed + leaf.swayPhase) * 0.02;
-      leaf.x += sway;
-      leaf.z += sway * 0.3;
-
-      // tumbling / rotating gently
-      leaf.rx += leaf.rs;
-      leaf.ry += leaf.rySpeed;
-      leaf.rz += leaf.rs;
-
-      dummy.position.set(leaf.x, leaf.y, leaf.z);
-      dummy.rotation.set(leaf.rx, leaf.ry, leaf.rz);
-      dummy.scale.setScalar(leaf.scale);
-      dummy.updateMatrix();
-      
-      meshRef.current!.setMatrixAt(i, dummy.matrix);
-    });
-    
-    meshRef.current.instanceMatrix.needsUpdate = true;
-  });
-
   return (
-    <instancedMesh ref={meshRef} args={[leafGeometry, null, count]}>
-      <meshStandardMaterial 
-        color="#36592C"
-        emissive="#6BB352"
-        emissiveIntensity={0.25}
-        roughness={0.35}
-        metalness={0.15}
-        transparent={true}
-        opacity={0.82}
-        side={THREE.DoubleSide}
-        depthWrite={false}
-      />
-    </instancedMesh>
+    <group>
+      {leaves.map((leaf, idx) => (
+        <SingleLeaf key={idx} leaf={leaf} geometry={leafGeometry} />
+      ))}
+    </group>
   );
 }

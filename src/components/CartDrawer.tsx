@@ -16,7 +16,7 @@ export default function CartDrawer() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={toggleCart}
-            className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[100]"
+            className="fixed inset-0 bg-black/60 z-[100]"
           />
           <motion.div 
             initial={{ x: '100%' }}
