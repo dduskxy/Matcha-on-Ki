@@ -10,7 +10,6 @@ import About from './pages/About';
 import CanvasBackground from './components/CanvasBackground';
 import FloatingBarista from './components/FloatingBarista';
 import CartDrawer from './components/CartDrawer';
-import BambooLeaves from './components/BambooLeaves';
 import CustomCursor from './components/CustomCursor';
 import Preloader from './components/Preloader';
 
@@ -21,7 +20,6 @@ function AppContent() {
       <Preloader />
       <CustomCursor />
       <CanvasBackground />
-      <BambooLeaves />
       <Navbar />
       <main>
         <AnimatePresence mode="wait">
