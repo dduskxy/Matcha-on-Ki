@@ -7,12 +7,12 @@ export default function Preloader() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Keep loading screen up until 3D is fully loaded and at least a minimal time has passed
-    // to prevent jarring flash if it loads instantly.
+    // Keep loading screen up slightly longer after 100% to allow Three.js
+    // to compile shaders and prevent a massive stutter during the fade-out.
     if (!active && progress === 100) {
       const timer = setTimeout(() => {
         setIsLoading(false);
-      }, 800);
+      }, 1500); 
       return () => clearTimeout(timer);
     }
   }, [active, progress]);
@@ -23,7 +23,8 @@ export default function Preloader() {
         <motion.div
           initial={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 1.2, ease: [0.76, 0, 0.24, 1] }}
+          transition={{ duration: 1.5, ease: "linear" }}
+          style={{ willChange: "opacity" }}
           className="fixed inset-0 z-[9999] bg-luxury-cream flex flex-col items-center justify-center cursor-wait"
         >
           <div className="overflow-hidden mb-6">
@@ -31,6 +32,7 @@ export default function Preloader() {
               initial={{ y: "100%" }}
               animate={{ y: 0 }}
               transition={{ duration: 1, ease: [0.2, 0.8, 0.2, 1] }}
+              style={{ willChange: "transform" }}
               className="text-4xl font-serif tracking-widest text-luxury-charcoal uppercase"
             >
               Matcha no Ki
@@ -41,17 +43,19 @@ export default function Preloader() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5, duration: 1 }}
+            style={{ willChange: "opacity" }}
             className="flex flex-col items-center gap-4"
           >
             <div className="text-[10px] tracking-[0.4em] uppercase text-luxury-charcoal/60">
               Brewing...
             </div>
-            {/* Minimal progress bar */}
+            {/* Minimal progress bar - GPU Accelerated */}
             <div className="w-32 h-[1px] bg-luxury-charcoal/10 relative overflow-hidden">
               <motion.div 
-                className="absolute top-0 left-0 h-full bg-luxury-matcha"
-                animate={{ width: `${progress}%` }}
-                transition={{ ease: "linear", duration: 0.2 }}
+                className="absolute top-0 left-0 h-full w-full bg-luxury-matcha origin-left"
+                style={{ willChange: "transform" }}
+                animate={{ scaleX: progress / 100 }}
+                transition={{ ease: "easeOut", duration: 0.3 }}
               />
             </div>
           </motion.div>
