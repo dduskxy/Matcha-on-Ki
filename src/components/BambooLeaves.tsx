@@ -46,6 +46,17 @@ const SingleLeaf = ({ leaf, geometry }: { leaf: any, geometry: THREE.BufferGeome
     leaf.x += sway;
     leaf.z += sway * 0.3;
 
+    // Deflect away from the central Zen Stones (radius ~2.8) to prevent unrealistic clipping
+    const distToCenter = Math.sqrt(leaf.x * leaf.x + leaf.z * leaf.z);
+    if (distToCenter < 2.8 && leaf.y < 2.5 && leaf.y > -2.5) {
+      const pushForce = (2.8 - distToCenter) * 0.04 * timeScale;
+      // push outwards from center
+      const dirX = leaf.x === 0 ? 1 : leaf.x / distToCenter;
+      const dirZ = leaf.z === 0 ? 1 : leaf.z / distToCenter;
+      leaf.x += dirX * pushForce;
+      leaf.z += dirZ * pushForce;
+    }
+
     // tumbling / rotating gently
     leaf.rx += leaf.rs * timeScale;
     leaf.ry += leaf.rySpeed * timeScale;
@@ -62,10 +73,7 @@ const SingleLeaf = ({ leaf, geometry }: { leaf: any, geometry: THREE.BufferGeome
         color="#4a6b32"
         roughness={0.6}
         metalness={0.0}
-        transparent={true}
-        opacity={0.95}
         side={THREE.DoubleSide}
-        depthWrite={false}
       />
     </mesh>
   );
