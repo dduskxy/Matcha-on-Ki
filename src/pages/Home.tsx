@@ -30,8 +30,8 @@ export default function Home() {
           transition={{ duration: 1.2, ease: [0.2, 0.8, 0.2, 1] }}
           className="w-full flex flex-col items-center mt-8 relative"
         >
-          {/* Subtle glow behind title for ultimate readability */}
-          <div className="absolute inset-0 bg-luxury-cream/40 blur-2xl -z-10 rounded-full scale-150"></div>
+          {/* Subtle glow behind title for ultimate readability - Optimized with radial gradient instead of CSS blur */}
+          <div className="absolute inset-0 bg-[radial-gradient(circle,rgba(252,251,248,0.85)_0%,rgba(252,251,248,0)_70%)] -z-10 rounded-full scale-[2.5]"></div>
 
           <span className="font-sans text-[10px] md:text-xs tracking-[0.5em] uppercase text-luxury-matcha font-bold mb-8 block">The Art of Stillness</span>
           
@@ -66,8 +66,8 @@ export default function Home() {
           transition={{ duration: 1.2, ease: [0.2, 0.8, 0.2, 1], delay: 0.4 }}
           className="w-full flex flex-col items-center mb-12 relative"
         >
-          {/* Subtle glow behind paragraph for ultimate readability */}
-          <div className="absolute inset-0 bg-luxury-cream/40 blur-2xl -z-10 rounded-full scale-150"></div>
+          {/* Subtle glow behind paragraph for ultimate readability - Optimized */}
+          <div className="absolute inset-0 bg-[radial-gradient(circle,rgba(252,251,248,0.95)_0%,rgba(252,251,248,0)_60%)] -z-10 rounded-full scale-[2]"></div>
 
           <p className="max-w-xl mx-auto text-sm md:text-base text-luxury-charcoal/75 font-light leading-loose mb-10 relative drop-shadow-sm">
             <span className="absolute -left-6 top-3 w-4 h-[1px] bg-gradient-to-r from-transparent to-luxury-matcha/50 hidden md:block"></span>
