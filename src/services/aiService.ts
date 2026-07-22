@@ -13,7 +13,8 @@ export const generateChatResponse = async (
   let headers: any = { 'Content-Type': 'application/json' };
 
   if (provider === 'gemini') {
-    url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
+    // Hardcode gemini-2.5-flash to override any deprecated models (e.g. 1.5) cached in user's localStorage
+    url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent`;
     headers['x-goog-api-key'] = apiKey;
     
     let geminiMessages = messages.map(m => ({ role: m.role === 'assistant' ? 'model' : 'user', parts: [{ text: m.content }] }));
