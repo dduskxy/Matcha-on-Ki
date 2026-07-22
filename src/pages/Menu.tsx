@@ -25,22 +25,20 @@ const containerVariants: Variants = {
 };
 
 const itemVariants: Variants = {
-  hidden: { opacity: 0, y: 50, filter: 'blur(10px)' },
+  hidden: { opacity: 0, y: 30 },
   show: { 
     opacity: 1, 
     y: 0, 
-    filter: 'blur(0px)',
     transition: { 
-      duration: 1.2,
+      duration: 1.0,
       ease: [0.16, 1, 0.3, 1]
     } 
   },
   exit: { 
     opacity: 0, 
-    y: -20,
-    filter: 'blur(10px)',
+    y: -10,
     transition: { 
-      duration: 0.4, 
+      duration: 0.3, 
       ease: [0.2, 0.8, 0.2, 1]
     } 
   }
