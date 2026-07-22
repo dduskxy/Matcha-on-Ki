@@ -3,19 +3,18 @@ import { useProgress } from '@react-three/drei';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Preloader() {
-  const { active, progress } = useProgress();
+  const { active, progress, total } = useProgress();
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Keep loading screen up slightly longer after 100% to allow Three.js
-    // to compile shaders and prevent a massive stutter during the fade-out.
-    if (!active && progress === 100) {
+    // Keep loading screen up slightly longer. If total === 0, there are no external assets to load.
+    if (!active && (progress === 100 || total === 0)) {
       const timer = setTimeout(() => {
         setIsLoading(false);
       }, 1500); 
       return () => clearTimeout(timer);
     }
-  }, [active, progress]);
+  }, [active, progress, total]);
 
   return (
     <AnimatePresence>
@@ -48,7 +47,7 @@ export default function Preloader() {
               <motion.div 
                 className="absolute top-0 left-0 h-full w-full bg-luxury-charcoal origin-left"
                 initial={{ scaleX: 0 }}
-                animate={{ scaleX: progress / 100 }}
+                animate={{ scaleX: (total === 0 && !active) ? 1 : progress / 100 }}
                 transition={{ ease: [0.76, 0, 0.24, 1], duration: 0.8 }}
               />
             </div>
