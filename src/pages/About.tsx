@@ -6,10 +6,11 @@ export default function About() {
     <PageTransition className="bg-transparent min-h-screen pt-40 pb-32 font-sans selection:bg-luxury-matcha selection:text-white">
       <div className="max-w-3xl mx-auto px-6 text-center">
         
-        {/* Glassmorphism Card for Ultimate Readability */}
-        <div className="bg-luxury-cream/85 backdrop-blur-2xl border border-white/40 shadow-[0_8px_32px_rgba(0,0,0,0.06)] rounded-[40px] px-8 py-16 md:px-16 md:py-24 relative overflow-hidden">
+        {/* Clean Layout with Soft Radial Glow (No boxy frames) */}
+        <div className="relative py-16 md:py-24 z-10 flex flex-col items-center">
           
-          {/* Subtle noise/texture overlay optional, kept clean for now */}
+          {/* Massive soft glow behind the text to ensure readability over the 3D model without a visible box */}
+          <div className="absolute inset-0 bg-[radial-gradient(circle,rgba(252,251,248,0.95)_0%,rgba(252,251,248,0.8)_40%,rgba(252,251,248,0)_70%)] -z-10 rounded-full scale-[2]"></div>
           
           <motion.h1 
             initial={{ opacity: 0, y: 10 }}
@@ -33,7 +34,7 @@ export default function About() {
               Rooted in the ancient principles of Chado (The Way of Tea), we strive to bring harmony, respect, purity, and tranquility into the modern world. Every leaf is meticulously sourced from the misty hills of Uji, Kyoto—handpicked and stone-ground to preserve its purest essence.
             </p>
             
-            <div className="w-px h-16 bg-gradient-to-b from-transparent via-luxury-charcoal/30 to-transparent mx-auto my-12"></div>
+            <div className="w-px h-16 bg-gradient-to-b from-transparent via-luxury-matcha/50 to-transparent mx-auto my-12"></div>
             
             <h2 className="text-xl md:text-2xl font-serif text-luxury-charcoal tracking-widest uppercase mb-8">Location & Hours</h2>
             <p className="text-[10px] md:text-xs tracking-[0.2em] uppercase text-luxury-charcoal/80">
