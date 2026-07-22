@@ -31,6 +31,24 @@ export default function FloatingBarista() {
     }
   }, [messages.length, isLoading]);
   
+  // Natively isolate scroll events to completely block Lenis from hijacking
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el || !isOpen) return;
+    
+    const stopPropagation = (e: Event) => e.stopPropagation();
+    
+    el.addEventListener('wheel', stopPropagation, { capture: true });
+    el.addEventListener('touchmove', stopPropagation, { capture: true });
+    el.addEventListener('touchstart', stopPropagation, { capture: true });
+    
+    return () => {
+      el.removeEventListener('wheel', stopPropagation, { capture: true });
+      el.removeEventListener('touchmove', stopPropagation, { capture: true });
+      el.removeEventListener('touchstart', stopPropagation, { capture: true });
+    };
+  }, [isOpen]);
+
   // Cleanup AbortController on unmount
   useEffect(() => {
     return () => {
@@ -130,7 +148,7 @@ export default function FloatingBarista() {
 
       {/* Chat Window */}
       <div 
-        className={`absolute bottom-20 right-0 w-[350px] md:w-[400px] h-[550px] bg-luxury-cream/98 border border-luxury-charcoal/10 shadow-2xl rounded-2xl flex flex-col overflow-hidden transition-all duration-300 origin-bottom-right ${isOpen ? 'opacity-100 scale-100 visible' : 'opacity-0 scale-95 invisible'}`}
+        className={`absolute bottom-20 right-0 w-[350px] md:w-[400px] h-[75vh] max-h-[550px] bg-luxury-cream/98 border border-luxury-charcoal/10 shadow-2xl rounded-2xl flex flex-col overflow-hidden transition-all duration-300 origin-bottom-right ${isOpen ? 'opacity-100 scale-100 visible' : 'opacity-0 scale-95 invisible'}`}
       >
         {/* Header */}
         <div className="bg-transparent px-6 py-5 flex justify-between items-center z-10 border-b border-luxury-charcoal/10">
@@ -150,12 +168,9 @@ export default function FloatingBarista() {
         ) : (
           <>
             {/* Scrollable Chat Area */}
-            {/* IMPORTANT: Added onWheel={(e) => e.stopPropagation()} to physically block Lenis or any parent scroller from hijacking this div */}
             <div 
-              className="flex-grow p-6 overflow-y-auto bg-transparent z-10 custom-scrollbar" 
+              className="flex-grow p-6 overflow-y-auto overscroll-contain bg-transparent z-10 custom-scrollbar" 
               ref={scrollRef} 
-              onWheel={(e) => e.stopPropagation()}
-              onTouchMove={(e) => e.stopPropagation()}
               data-lenis-prevent="true"
             >
               <div className="flex justify-center pb-6">
