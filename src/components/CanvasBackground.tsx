@@ -17,42 +17,42 @@ const ZenStones = () => {
 
   return (
     <group ref={groupRef} position={[0, -0.5, 0]} scale={1.3}>
-      {/* Bottom Stone (Matte Porcelain) */}
+      {/* Bottom Stone (Deep Walnut Wood/Earth - "Ki" Element) */}
       <mesh position={[0, -0.9, 0]} rotation={[0.05, 0.4, -0.05]} scale={[1.9, 0.4, 1.8]} castShadow receiveShadow>
         <sphereGeometry args={[1, 48, 48]} />
         <meshPhysicalMaterial 
-          color="#f4f0ea" 
-          roughness={0.4} 
+          color="#2c1e16" 
+          roughness={0.85} 
           metalness={0.05}
           clearcoat={0.1}
-          clearcoatRoughness={0.5}
+          clearcoatRoughness={0.8}
         />
       </mesh>
       
-      {/* Middle Stone (Glazed Porcelain) */}
+      {/* Middle Stone (Wabi-Sabi Ceramic Chawan - "Tea Bowl" Element) */}
       <mesh position={[0.1, -0.3, 0.05]} rotation={[-0.1, -0.2, 0.1]} scale={[1.2, 0.35, 1.1]} castShadow receiveShadow>
         <sphereGeometry args={[1, 48, 48]} />
         <meshPhysicalMaterial 
-          color="#fcf9f5" 
-          roughness={0.2} 
-          metalness={0.05}
-          clearcoat={0.5}
+          color="#e8e3d9" 
+          roughness={0.3} 
+          metalness={0.0}
+          clearcoat={0.4}
           clearcoatRoughness={0.2}
         />
       </mesh>
 
-      {/* Top Stone (Translucent White Jade / Frosted Porcelain) */}
+      {/* Top Stone (Ceremonial Matcha Gem - "Matcha" Element) */}
       <mesh position={[-0.05, 0.15, -0.05]} rotation={[0.15, 0.6, -0.15]} scale={[0.6, 0.25, 0.5]} castShadow receiveShadow>
         <sphereGeometry args={[1, 48, 48]} />
         <meshPhysicalMaterial 
-          color="#ffffff"
-          roughness={0.15}
+          color="#4a7a3a"
+          roughness={0.1}
           metalness={0.0}
           transmission={0.8}
-          ior={1.4}
-          thickness={1.5}
-          clearcoat={0.8}
-          clearcoatRoughness={0.1}
+          ior={1.5}
+          thickness={1.0}
+          clearcoat={1.0}
+          clearcoatRoughness={0.05}
         />
       </mesh>
     </group>
@@ -102,31 +102,31 @@ export default function CanvasBackground() {
         
         {/* Cinematic 3-Point Lighting */}
         
-        {/* Ambient Fill (Soft Base Light - Warm Cream) */}
-        <ambientLight intensity={0.4} color="#faf7f2" />
+        {/* Ambient Fill (Soft Warm Base) */}
+        <ambientLight intensity={0.5} color="#f5f0e6" />
         
-        {/* Key Light (Sun) - Lowered intensity slightly for white objects to prevent blowout */}
+        {/* Key Light (Sun) - Pure white to show true colors */}
         <directionalLight
           position={[6, 12, -4]}
-          intensity={2.2}
+          intensity={2.5}
           color="#ffffff"
           castShadow
           shadow-mapSize={[512, 512]}
           shadow-bias={-0.0001}
         />
         
-        {/* Fill Light (Sky reflection) */}
+        {/* Fill Light (Soft daylight) */}
         <directionalLight
           position={[-6, 6, 6]}
-          intensity={1.0}
-          color="#e6f2ff"
+          intensity={0.8}
+          color="#e6ecf2"
         />
 
-        {/* Rim Light (Champagne Gold) - True Luxury edge highlighting */}
+        {/* Rim Light (Warm Golden Sunlight) - Highlights edges gracefully */}
         <pointLight
           position={[0, -1.5, -5]}
           intensity={2.5}
-          color="#d4af37"
+          color="#fceea7"
         />
         
         {/* Morning Mist Particles */}
