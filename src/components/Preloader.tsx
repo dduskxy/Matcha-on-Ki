@@ -41,7 +41,7 @@ export default function Preloader() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5, duration: 1 }}
-            className="flex flex-col items-center gap-6 mt-8"
+            className="flex flex-col items-center mt-6"
           >
             {/* Ultra Minimal progress bar */}
             <div className="w-64 h-[1px] bg-luxury-charcoal/10 relative overflow-hidden">
@@ -51,11 +51,6 @@ export default function Preloader() {
                 animate={{ scaleX: progress / 100 }}
                 transition={{ ease: [0.76, 0, 0.24, 1], duration: 0.8 }}
               />
-            </div>
-            
-            <div className="flex justify-between w-64 text-[9px] tracking-[0.2em] uppercase text-luxury-charcoal/50 font-medium">
-              <span>Brewing</span>
-              <span>{Math.round(progress)}%</span>
             </div>
           </motion.div>
         </motion.div>
