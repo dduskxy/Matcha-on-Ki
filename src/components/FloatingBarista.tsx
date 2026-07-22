@@ -112,8 +112,8 @@ export default function FloatingBarista() {
                                     onClick={(e) => {
                                       e.preventDefault();
                                       if (props.href?.includes('add-to-cart')) {
-                                        const url = new URL(props.href, window.location.origin);
-                                        const id = url.searchParams.get('id');
+                                        const match = props.href.match(/[?&]id=([^&]+)/);
+                                        const id = match ? match[1] : null;
                                         const item = menuData.find(m => m.id === id);
                                         if (item) addItem(item);
                                       } else if (props.href?.includes('menu')) {
