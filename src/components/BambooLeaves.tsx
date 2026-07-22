@@ -59,13 +59,11 @@ const SingleLeaf = ({ leaf, geometry }: { leaf: any, geometry: THREE.BufferGeome
   return (
     <mesh ref={meshRef} geometry={geometry}>
       <meshStandardMaterial 
-        color="#36592C"
-        emissive="#3E542C"
-        emissiveIntensity={0.1}
-        roughness={0.2}
-        metalness={0.1}
+        color="#4a6b32"
+        roughness={0.6}
+        metalness={0.0}
         transparent={true}
-        opacity={0.9}
+        opacity={0.95}
         side={THREE.DoubleSide}
         depthWrite={false}
       />
@@ -73,7 +71,7 @@ const SingleLeaf = ({ leaf, geometry }: { leaf: any, geometry: THREE.BufferGeome
   );
 };
 
-export default function BambooLeaves({ count = 15 }) {
+export default function BambooLeaves({ count = 60 }) {
   const leafGeometry = useMemo(() => createBambooLeafGeometry(), []);
   
   const leaves = useMemo(() => {
