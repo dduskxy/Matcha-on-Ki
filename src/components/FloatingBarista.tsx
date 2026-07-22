@@ -18,7 +18,7 @@ export default function FloatingBarista() {
   
   const { messages, addMessage, clearChat, systemPrompt } = useChatStore();
   const { apiKeys, selectedProvider, selectedModel } = useSettingsStore();
-  const addItem = useCartStore((state) => state.addItem);
+  const { addItem, isCartOpen } = useCartStore();
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -84,7 +84,9 @@ export default function FloatingBarista() {
   };
 
   return (
-    <div className="fixed bottom-8 right-8 z-[999] font-sans">
+    <div 
+      className={`fixed bottom-8 z-[999] font-sans transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${isCartOpen ? 'right-[-400px] md:right-[432px]' : 'right-4 md:right-8'}`}
+    >
       <button 
         onClick={() => setIsOpen(!isOpen)}
         className={`absolute bottom-0 right-0 w-14 h-14 rounded-full flex items-center justify-center transition-all duration-500 shadow-xl border border-luxury-charcoal/5 z-50 ${isOpen ? 'bg-luxury-cream text-luxury-charcoal scale-90' : 'bg-white text-luxury-charcoal hover:bg-luxury-cream hover:scale-105'}`}
