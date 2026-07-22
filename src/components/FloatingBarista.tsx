@@ -111,18 +111,36 @@ export default function FloatingBarista() {
                                   <button 
                                     onClick={(e) => {
                                       e.preventDefault();
-                                      if (props.href?.includes('add-to-cart')) {
-                                        const match = props.href.match(/[?&]id=([^&]+)/);
-                                        const id = match ? match[1] : null;
-                                        const item = menuData.find(m => m.id === id);
-                                        if (item) addItem(item);
-                                      } else if (props.href?.includes('menu')) {
-                                        const hashUrl = props.href.startsWith('/#') ? props.href.substring(2) : props.href;
+                                      const href = props.href || '';
+                                      
+                                      // 1. ADD TO CART
+                                      if (href.includes('cart') || href.includes('add')) {
+                                        // Try to find the item ID (e.g. ?id=m1, ?item=m1, or just /m1)
+                                        const match = href.match(/[?&](?:id|item)=([^&]+)/i) || href.match(/([mcst]\d)/i);
+                                        const id = match ? match[1].toLowerCase() : null;
+                                        const item = menuData.find(m => m.id.toLowerCase() === id);
+                                        
+                                        if (item) {
+                                          addItem(item);
+                                        } else {
+                                          // Fallback if AI hallucinates wrong ID: just open the cart
+                                          useCartStore.getState().toggleCart();
+                                        }
+                                      } 
+                                      // 2. MENU
+                                      else if (href.includes('menu')) {
+                                        const hashUrl = href.startsWith('/#') ? href.substring(2) : href;
                                         navigate(hashUrl);
-                                      } else if (props.href?.startsWith('/')) {
-                                        navigate(props.href);
-                                      } else {
-                                        window.open(props.href, '_blank');
+                                        setIsOpen(false); // Close chatbot to view menu
+                                      } 
+                                      // 3. INTERNAL ROUTES
+                                      else if (href.startsWith('/') || href.startsWith('#')) {
+                                        const cleanUrl = href.replace(/^#\/?/, '/');
+                                        navigate(cleanUrl);
+                                      } 
+                                      // 4. EXTERNAL
+                                      else {
+                                        window.open(href, '_blank');
                                       }
                                     }}
                                     className="text-luxury-matcha border-b border-luxury-matcha/30 hover:border-luxury-matcha transition-colors"
