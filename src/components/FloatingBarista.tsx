@@ -91,7 +91,7 @@ export default function FloatingBarista() {
             ) : (
               <>
                 {/* Chat Area */}
-                <div className="flex-grow p-6 overflow-y-auto bg-transparent z-10 scrollbar-hide" ref={scrollRef}>
+                <div className="flex-grow p-6 overflow-y-auto overscroll-contain bg-transparent z-10 custom-scrollbar" ref={scrollRef}>
                   <div className="flex justify-center pb-6">
                     <button onClick={() => clearChat()} className="text-[9px] tracking-[0.3em] uppercase text-luxury-charcoal/20 hover:text-luxury-charcoal transition border-b border-transparent hover:border-luxury-charcoal pb-1">
                       Start Anew

@@ -27,6 +27,34 @@
   }
 }
 
+@layer utilities {
+  .text-shadow-sm {
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  }
+  .text-shadow {
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  .text-shadow-lg {
+    text-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+  }
+
+  /* Elegant Custom Scrollbar for Chatbot */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+    display: block;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(44, 54, 46, 0.1); /* luxury-charcoal with 10% opacity */
+    border-radius: 10px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(44, 54, 46, 0.2);
+  }
+}
+
 /* Global Scrollbar Hide */
 ::-webkit-scrollbar {
   display: none;
