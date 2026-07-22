@@ -6,6 +6,7 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Home from './pages/Home';
 import Menu from './pages/Menu';
+import About from './pages/About';
 import CanvasBackground from './components/CanvasBackground';
 import FloatingBarista from './components/FloatingBarista';
 import CartDrawer from './components/CartDrawer';
@@ -23,7 +24,7 @@ function AppContent() {
           <Routes location={location} key={location.pathname}>
             <Route path="/" element={<Home />} />
             <Route path="/menu" element={<Menu />} />
-            <Route path="/about" element={<div className="h-screen flex items-center justify-center font-mono text-cyber-matcha">SYSTEM INFO: V1.0 - ALL NOMINAL</div>} />
+            <Route path="/about" element={<About />} />
           </Routes>
         </AnimatePresence>
       </main>
