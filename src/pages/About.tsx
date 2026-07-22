@@ -1,14 +1,9 @@
 import { motion } from 'framer-motion';
+import PageTransition from '../components/PageTransition';
 
 export default function About() {
   return (
-    <motion.div 
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20, transition: { duration: 0.3 } }}
-      transition={{ duration: 1.2, ease: [0.2, 0.8, 0.2, 1] }}
-      className="bg-transparent min-h-screen pt-40 pb-32 font-sans selection:bg-luxury-matcha selection:text-white"
-    >
+    <PageTransition className="bg-transparent min-h-screen pt-40 pb-32 font-sans selection:bg-luxury-matcha selection:text-white">
       <div className="max-w-3xl mx-auto px-6 text-center">
         
         {/* Glassmorphism Card for Ultimate Readability */}
@@ -52,6 +47,6 @@ export default function About() {
           </motion.div>
         </div>
       </div>
-    </motion.div>
+    </PageTransition>
   );
 }

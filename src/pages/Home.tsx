@@ -1,16 +1,11 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Magnetic from '../components/Magnetic';
+import PageTransition from '../components/PageTransition';
 
 export default function Home() {
   return (
-    <motion.div 
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20, transition: { duration: 0.3 } }}
-      transition={{ duration: 1.2, ease: [0.2, 0.8, 0.2, 1] }}
-      className="min-h-screen pt-32 pb-20 selection:bg-luxury-matcha selection:text-white relative overflow-hidden"
-    >
+    <PageTransition className="min-h-screen pt-32 pb-20 selection:bg-luxury-matcha selection:text-white relative overflow-hidden">
       
       {/* Large Decorative Kanji Watermark (Adds depth without clutter) */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[40vh] font-serif text-luxury-charcoal/[0.04] pointer-events-none select-none z-0 whitespace-nowrap">
@@ -103,6 +98,6 @@ export default function Home() {
         ></motion.div>
       </motion.div>
 
-    </motion.div>
+    </PageTransition>
   );
 }

@@ -4,14 +4,15 @@ import { menuData, type MenuItem } from '../data/menuData';
 import { Coffee, GlassWater, Leaf, Circle, Plus } from 'lucide-react';
 import { motion, AnimatePresence, type Variants } from 'framer-motion';
 import { useCartStore } from '../store/useCartStore';
+import PageTransition from '../components/PageTransition';
 
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
   show: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.1,
-      delayChildren: 0.1,
+      staggerChildren: 0.15,
+      delayChildren: 0.2,
     },
   },
   exit: {
@@ -24,22 +25,22 @@ const containerVariants: Variants = {
 };
 
 const itemVariants: Variants = {
-  hidden: { opacity: 0, y: 40 },
+  hidden: { opacity: 0, y: 50, filter: 'blur(10px)' },
   show: { 
     opacity: 1, 
     y: 0, 
+    filter: 'blur(0px)',
     transition: { 
-      type: "spring",
-      stiffness: 40,
-      damping: 15,
-      mass: 1,
+      duration: 1.2,
+      ease: [0.16, 1, 0.3, 1]
     } 
   },
   exit: { 
     opacity: 0, 
     y: -20,
+    filter: 'blur(10px)',
     transition: { 
-      duration: 0.6, 
+      duration: 0.4, 
       ease: [0.2, 0.8, 0.2, 1]
     } 
   }
@@ -82,13 +83,7 @@ export default function Menu() {
   };
 
   return (
-    <motion.div 
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20, transition: { duration: 0.3 } }}
-      transition={{ duration: 1.2, ease: [0.2, 0.8, 0.2, 1] }}
-      className="bg-luxury-cream min-h-screen pt-32 pb-32 font-sans selection:bg-luxury-matcha selection:text-white"
-    >
+    <PageTransition className="bg-luxury-cream min-h-screen pt-32 pb-32 font-sans selection:bg-luxury-matcha selection:text-white">
       <div className="max-w-5xl mx-auto px-6">
         
         {/* Header */}
@@ -125,6 +120,9 @@ export default function Menu() {
             {filteredMenu.map(item => (
               <motion.div 
                 variants={itemVariants}
+                initial="hidden"
+                whileInView="show"
+                viewport={{ once: true, margin: "-50px" }}
                 key={item.id} 
                 onClick={() => setSelectedItem(item)}
                 className="group cursor-pointer flex gap-10 items-center border-b border-transparent hover:border-luxury-charcoal/30 pb-6 transition-all duration-700"
@@ -199,6 +197,6 @@ export default function Menu() {
           </motion.div>
         )}
       </AnimatePresence>
-    </motion.div>
+    </PageTransition>
   );
 }
