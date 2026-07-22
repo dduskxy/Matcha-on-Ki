@@ -1,7 +1,7 @@
 import { useRef } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 
-import { OrbitControls, Sparkles, ContactShadows, Environment, MeshTransmissionMaterial } from '@react-three/drei';
+import { OrbitControls, Sparkles, ContactShadows, Environment } from '@react-three/drei';
 import * as THREE from 'three';
 import BambooLeaves from './BambooLeaves';
 
@@ -19,7 +19,7 @@ const ZenStones = () => {
     <group ref={groupRef} position={[0, -0.5, 0]} scale={1.3}>
       {/* Bottom Stone (Polished Obsidian) */}
       <mesh position={[0, -0.8, 0]} rotation={[0.05, 0.2, -0.05]} scale={[1.7, 0.5, 1.6]} castShadow receiveShadow>
-        <sphereGeometry args={[1, 64, 64]} />
+        <sphereGeometry args={[1, 32, 32]} />
         <meshPhysicalMaterial 
           color="#1a1a1c" 
           roughness={0.3} 
@@ -31,7 +31,7 @@ const ZenStones = () => {
       
       {/* Middle Stone (Matcha Jade) */}
       <mesh position={[0.05, -0.1, 0.05]} rotation={[-0.1, -0.4, 0.05]} scale={[1.4, 0.4, 1.3]} castShadow receiveShadow>
-        <sphereGeometry args={[1, 64, 64]} />
+        <sphereGeometry args={[1, 32, 32]} />
         <meshPhysicalMaterial 
           color="#5e7a53" 
           roughness={0.2} 
@@ -43,23 +43,17 @@ const ZenStones = () => {
         />
       </mesh>
 
-      {/* Top Stone (Frosted Quartz / Glass) */}
+      {/* Top Stone (Frosted Quartz / Glass) - Optimized native material */}
       <mesh position={[-0.05, 0.4, -0.05]} rotation={[0.1, 0.5, -0.1]} scale={[0.8, 0.3, 0.7]} castShadow receiveShadow>
-        <sphereGeometry args={[1, 64, 64]} />
-        <MeshTransmissionMaterial 
-          backside
-          samples={4}
-          thickness={1.5}
-          chromaticAberration={0.05}
-          anisotropy={0.1}
-          distortion={0.2}
-          distortionScale={0.3}
-          temporalDistortion={0.1}
-          clearcoat={1}
-          attenuationDistance={0.5}
-          attenuationColor="#ffffff"
+        <sphereGeometry args={[1, 32, 32]} />
+        <meshPhysicalMaterial 
           color="#f5f7fa"
-          roughness={0.1}
+          roughness={0.15}
+          transmission={0.9}
+          ior={1.5}
+          thickness={1.5}
+          clearcoat={1}
+          clearcoatRoughness={0.1}
         />
       </mesh>
     </group>
@@ -153,7 +147,7 @@ export default function CanvasBackground() {
           blur={2.5} 
           opacity={0.7} 
           far={10} 
-          resolution={1024} 
+          resolution={512} 
           color="#1a2636" 
         />
       </Canvas>
