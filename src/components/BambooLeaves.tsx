@@ -27,12 +27,13 @@ const createBambooLeafGeometry = () => {
 const SingleLeaf = ({ leaf, geometry }: { leaf: any, geometry: THREE.BufferGeometry }) => {
   const meshRef = useRef<THREE.Mesh>(null);
 
-  useFrame((state) => {
+  useFrame((state, delta) => {
     if (!meshRef.current) return;
     const time = state.clock.getElapsedTime();
+    const timeScale = Math.min(delta * 60, 2); // Cap delta to prevent massive jumps on tab switch
 
-    // falling down
-    leaf.y -= leaf.speed;
+    // falling down smoothly
+    leaf.y -= leaf.speed * timeScale;
     
     // loop back to top when they fall past the floor
     if (leaf.y < -12) {
@@ -41,14 +42,14 @@ const SingleLeaf = ({ leaf, geometry }: { leaf: any, geometry: THREE.BufferGeome
     }
 
     // swaying side to side gently in the wind
-    const sway = Math.sin(time * leaf.swaySpeed + leaf.swayPhase) * 0.02;
+    const sway = Math.sin(time * leaf.swaySpeed + leaf.swayPhase) * 0.02 * timeScale;
     leaf.x += sway;
     leaf.z += sway * 0.3;
 
     // tumbling / rotating gently
-    leaf.rx += leaf.rs;
-    leaf.ry += leaf.rySpeed;
-    leaf.rz += leaf.rs;
+    leaf.rx += leaf.rs * timeScale;
+    leaf.ry += leaf.rySpeed * timeScale;
+    leaf.rz += leaf.rs * timeScale;
 
     meshRef.current.position.set(leaf.x, leaf.y, leaf.z);
     meshRef.current.rotation.set(leaf.rx, leaf.ry, leaf.rz);

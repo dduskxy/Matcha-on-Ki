@@ -66,15 +66,10 @@ const ZenRipple = () => {
 
 export default function CanvasBackground() {
   return (
-    <motion.div 
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 2.5, ease: "easeInOut" }}
-      className="fixed inset-0 z-[-10]"
-    >
+    <div className="fixed inset-0 z-[-10]">
       <Canvas 
         camera={{ position: [0, 0, 7], fov: 45 }} 
-        dpr={[1, 1]} 
+        dpr={[1, 1.5]} 
         performance={{ min: 0.5 }}
         gl={{ antialias: false, stencil: false, depth: true, powerPreference: "high-performance" }}
         raycaster={{ enabled: false }}
@@ -97,14 +92,19 @@ export default function CanvasBackground() {
           maxPolarAngle={Math.PI / 2 + 0.2}
           minAzimuthAngle={-0.5}
           maxAzimuthAngle={0.5}
-          enableDamping={false}
+          enableDamping={true}
+          dampingFactor={0.05}
         />
         
         <ZenStones />
         <ZenRipple />
         
-        <ContactShadows position={[0, -2.5, 0]} opacity={0.4} scale={25} blur={1} far={4.5} resolution={128} frames={1} />
+        {/* Ultra-Fast Fake Shadow instead of heavy ContactShadows */}
+        <mesh position={[0, -2.49, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+          <circleGeometry args={[2.5, 32]} />
+          <meshBasicMaterial color="#000000" transparent opacity={0.15} />
+        </mesh>
       </Canvas>
-    </motion.div>
+    </div>
   );
 }
