@@ -43,7 +43,17 @@ export const generateChatResponse = async (
     body: JSON.stringify(payload),
     signal
   });
-  if (!res.ok) throw new Error(`API Error: ${res.statusText}`);
+  
+  if (!res.ok) {
+    let errMsg = res.statusText;
+    try {
+      const errData = await res.json();
+      errMsg = errData.error?.message || JSON.stringify(errData);
+    } catch(e) {
+      errMsg = await res.text();
+    }
+    throw new Error(`API Error ${res.status}: ${errMsg}`);
+  }
   
   const data = await res.json();
   if (provider === 'gemini') {
