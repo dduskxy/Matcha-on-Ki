@@ -45,15 +45,17 @@ export default function CustomCursor() {
   return (
     <>
       <motion.div
-        className="fixed top-0 left-0 w-3 h-3 bg-white rounded-full pointer-events-none z-[9999] mix-blend-difference hidden md:flex items-center justify-center"
+        className="fixed top-0 left-0 w-4 h-4 bg-luxury-matcha/60 border-2 border-white rounded-full pointer-events-none z-[9999] hidden md:flex items-center justify-center shadow-sm"
         style={{
           x: smoothX,
           y: smoothY,
           translateX: '-50%',
           translateY: '-50%',
+          willChange: 'transform',
         }}
         animate={{
-          scale: isHovered ? 4 : 1,
+          scale: isHovered ? 2.5 : 1,
+          backgroundColor: isHovered ? 'rgba(74, 122, 58, 0.2)' : 'rgba(74, 122, 58, 0.6)',
         }}
         transition={{ type: 'spring', stiffness: 300, damping: 25, mass: 0.1 }}
       />
