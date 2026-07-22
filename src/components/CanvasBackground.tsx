@@ -129,11 +129,17 @@ export default function CanvasBackground() {
           color="#fceea7"
         />
         
-        {/* Morning Mist Particles */}
-        <Sparkles count={50} scale={20} size={3} speed={0.4} opacity={0.6} color="#85b865" />
-
-        {/* Fantasy Zen Bamboo Leaves */}
-        <BambooLeaves count={60} />
+        {/* Magical Ceremonial Matcha Dust (Golden/Green Mist) */}
+        <Sparkles 
+          count={60} 
+          scale={12} 
+          size={4} 
+          speed={0.2} 
+          opacity={0.15} 
+          noise={0.2}
+          color="#fceea7" 
+        />        {/* Fantasy Zen Bamboo Leaves */}
+        <BambooLeaves count={25} />
 
         <OrbitControls 
           enableZoom={false}

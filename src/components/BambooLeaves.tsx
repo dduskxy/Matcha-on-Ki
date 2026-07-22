@@ -69,34 +69,48 @@ const SingleLeaf = ({ leaf, geometry }: { leaf: any, geometry: THREE.BufferGeome
 
   return (
     <mesh ref={meshRef} geometry={geometry}>
-      <meshStandardMaterial 
-        color="#4a6b32"
-        roughness={0.6}
-        metalness={0.0}
+      <meshPhysicalMaterial 
+        color={leaf.color}
+        roughness={0.4}
+        metalness={0.1}
+        transmission={0.4}
+        thickness={0.05}
+        clearcoat={0.3}
+        clearcoatRoughness={0.2}
         side={THREE.DoubleSide}
       />
     </mesh>
   );
 };
 
-export default function BambooLeaves({ count = 15 }) {
+export default function BambooLeaves({ count = 25 }) {
   const leafGeometry = useMemo(() => createBambooLeafGeometry(), []);
   
+  const leafColors = ['#2c4217', '#466329', '#5a8232', '#709940', '#3b5420'];
+
   const leaves = useMemo(() => {
-    return new Array(count).fill(0).map(() => ({
-      x: (Math.random() - 0.5) * 25,
-      y: Math.random() * 25 - 5,
-      z: (Math.random() - 0.5) * 15 - 5,
-      scale: Math.random() * 0.6 + 0.3,
-      speed: Math.random() * 0.02 + 0.008,
-      swaySpeed: Math.random() * 0.8 + 0.4,
-      swayPhase: Math.random() * Math.PI * 2,
-      rx: Math.random() * Math.PI * 2,
-      ry: Math.random() * Math.PI * 2,
-      rz: Math.random() * Math.PI * 2,
-      rs: (Math.random() - 0.5) * 0.015,
-      rySpeed: (Math.random() - 0.5) * 0.025,
-    }));
+    return new Array(count).fill(0).map(() => {
+      // Exaggerated scale: heavily bias towards smaller background leaves, with a few massive foreground ones
+      const isForeground = Math.random() > 0.85;
+      const baseScale = isForeground ? Math.random() * 2.0 + 1.2 : Math.random() * 0.5 + 0.2;
+      const randomColor = leafColors[Math.floor(Math.random() * leafColors.length)];
+
+      return {
+        x: (Math.random() - 0.5) * 25,
+        y: Math.random() * 25 - 5,
+        z: (Math.random() - 0.5) * 15 - 2, // Push slightly back so they don't block the UI
+        scale: baseScale,
+        color: randomColor,
+        speed: Math.random() * 0.015 + 0.005,
+        swaySpeed: Math.random() * 0.5 + 0.2,
+        swayPhase: Math.random() * Math.PI * 2,
+        rx: Math.random() * Math.PI * 2,
+        ry: Math.random() * Math.PI * 2,
+        rz: Math.random() * Math.PI * 2,
+        rs: (Math.random() - 0.5) * 0.015,
+        rySpeed: (Math.random() - 0.5) * 0.02,
+      };
+    });
   }, [count]);
 
   return (
