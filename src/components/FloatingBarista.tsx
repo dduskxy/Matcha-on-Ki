@@ -4,24 +4,44 @@ import { useSettingsStore } from '../store/useSettingsStore';
 import { useCartStore } from '../store/useCartStore';
 import { menuData } from '../data/menuData';
 import { generateChatResponse } from '../services/aiService';
-import { Loader2, X, Settings, Leaf, ShoppingBag } from 'lucide-react';
+import { Loader2, X, Settings, Leaf } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import ApiKeyManager from './Chat/ApiKeyManager';
+import { useNavigate } from 'react-router-dom';
+import { useLenis } from 'lenis/react';
 
 export default function FloatingBarista() {
   const [isOpen, setIsOpen] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const navigate = useNavigate();
+  const lenis = useLenis();
   
   const { messages, addMessage, clearChat, systemPrompt } = useChatStore();
   const { apiKeys, selectedProvider, selectedModel } = useSettingsStore();
-  const addItem = useCartStore((state) => state.addItem); // Atomic selector to prevent global re-renders
+  const addItem = useCartStore((state) => state.addItem);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
 
-  // Auto-scroll to bottom (only when messages length or loading state changes)
+  // GUARANTEED SCROLL FIX: Stop Lenis completely when chatbot is open
+  useEffect(() => {
+    if (isOpen) {
+      lenis?.stop();
+      // Also lock body scroll as a fallback
+      document.body.style.overflow = 'hidden';
+    } else {
+      lenis?.start();
+      document.body.style.overflow = '';
+    }
+    return () => {
+      lenis?.start();
+      document.body.style.overflow = '';
+    };
+  }, [isOpen, lenis]);
+
+  // Auto-scroll to bottom
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTo({
@@ -31,39 +51,16 @@ export default function FloatingBarista() {
     }
   }, [messages.length, isLoading]);
   
-  // Natively isolate scroll events to completely block Lenis from hijacking
-  useEffect(() => {
-    const el = scrollRef.current;
-    if (!el || !isOpen) return;
-    
-    const stopPropagation = (e: Event) => e.stopPropagation();
-    
-    el.addEventListener('wheel', stopPropagation, { capture: true });
-    el.addEventListener('touchmove', stopPropagation, { capture: true });
-    el.addEventListener('touchstart', stopPropagation, { capture: true });
-    
-    return () => {
-      el.removeEventListener('wheel', stopPropagation, { capture: true });
-      el.removeEventListener('touchmove', stopPropagation, { capture: true });
-      el.removeEventListener('touchstart', stopPropagation, { capture: true });
-    };
-  }, [isOpen]);
-
-  // Cleanup AbortController on unmount
   useEffect(() => {
     return () => {
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
-      }
+      if (abortControllerRef.current) abortControllerRef.current.abort();
     };
   }, []);
 
   const handleSend = async () => {
     if (!input.trim() || !apiKeys[selectedProvider] || isLoading) return;
     
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
-    }
+    if (abortControllerRef.current) abortControllerRef.current.abort();
     abortControllerRef.current = new AbortController();
     
     const userText = input;
@@ -74,12 +71,7 @@ export default function FloatingBarista() {
     try {
       const history = messages.map(m => ({ role: m.role, content: m.content })).concat({ role: 'user', content: userText });
       const responseText = await generateChatResponse(
-        history, 
-        systemPrompt,
-        apiKeys[selectedProvider],
-        selectedProvider,
-        selectedModel,
-        abortControllerRef.current.signal
+        history, systemPrompt, apiKeys[selectedProvider], selectedProvider, selectedModel, abortControllerRef.current.signal
       );
       addMessage({ id: (Date.now()+1).toString(), role: 'assistant', content: responseText, timestamp: Date.now() });
     } catch (error: any) {
@@ -91,54 +83,8 @@ export default function FloatingBarista() {
     }
   };
 
-  // Render a chat message, extracting [CART:id] tags into actual buttons
-  const renderMessageContent = (content: string, role: string) => {
-    if (role === 'user') return <ReactMarkdown className="prose prose-sm max-w-none prose-p:leading-relaxed">{content}</ReactMarkdown>;
-
-    // Regex to find all [CART:id] tags
-    const cartRegex = /\[CART:([a-zA-Z0-9_-]+)\]/g;
-    const cartIds: string[] = [];
-    let match;
-    while ((match = cartRegex.exec(content)) !== null) {
-      cartIds.push(match[1]);
-    }
-    
-    // Remove the tags from the display text
-    const cleanContent = content.replace(cartRegex, '').trim();
-
-    return (
-      <div className="flex flex-col gap-3">
-        <ReactMarkdown className="prose prose-sm max-w-none prose-p:leading-relaxed">
-          {cleanContent}
-        </ReactMarkdown>
-        
-        {/* Render extracted cart buttons */}
-        {cartIds.length > 0 && (
-          <div className="flex flex-col gap-2 mt-2 pt-2 border-t border-luxury-charcoal/10">
-            {cartIds.map((id, idx) => {
-              const item = menuData.find(m => m.id.toLowerCase() === id.toLowerCase());
-              if (!item) return null;
-              return (
-                <button
-                  key={idx}
-                  onClick={() => addItem(item)}
-                  className="flex items-center gap-2 bg-luxury-matcha text-white px-4 py-2 rounded-lg text-xs tracking-wider uppercase font-medium hover:bg-[#3d6530] transition-colors shadow-sm"
-                >
-                  <ShoppingBag className="w-3 h-3" />
-                  Add {item.name} (¥{item.price})
-                </button>
-              );
-            })}
-          </div>
-        )}
-      </div>
-    );
-  };
-
   return (
     <div className="fixed bottom-8 right-8 z-[999] font-sans">
-      
-      {/* Floating Toggle Button */}
       <button 
         onClick={() => setIsOpen(!isOpen)}
         className={`absolute bottom-0 right-0 w-14 h-14 rounded-full flex items-center justify-center transition-all duration-500 shadow-xl border border-luxury-charcoal/5 z-50 ${isOpen ? 'bg-luxury-cream text-luxury-charcoal scale-90' : 'bg-white text-luxury-charcoal hover:bg-luxury-cream hover:scale-105'}`}
@@ -146,11 +92,9 @@ export default function FloatingBarista() {
         {isOpen ? <X className="w-5 h-5" strokeWidth={1.5} /> : <Leaf className="w-5 h-5" strokeWidth={1.5} />}
       </button>
 
-      {/* Chat Window */}
       <div 
         className={`absolute bottom-20 right-0 w-[350px] md:w-[400px] h-[75vh] max-h-[550px] bg-luxury-cream/98 border border-luxury-charcoal/10 shadow-2xl rounded-2xl flex flex-col overflow-hidden transition-all duration-300 origin-bottom-right ${isOpen ? 'opacity-100 scale-100 visible' : 'opacity-0 scale-95 invisible'}`}
       >
-        {/* Header */}
         <div className="bg-transparent px-6 py-5 flex justify-between items-center z-10 border-b border-luxury-charcoal/10">
           <div>
             <h3 className="font-serif text-lg tracking-widest uppercase text-luxury-charcoal">Matcha Maid</h3>
@@ -167,11 +111,9 @@ export default function FloatingBarista() {
           </div>
         ) : (
           <>
-            {/* Scrollable Chat Area */}
             <div 
               className="flex-grow p-6 overflow-y-auto overscroll-contain bg-transparent z-10 custom-scrollbar" 
               ref={scrollRef} 
-              data-lenis-prevent="true"
             >
               <div className="flex justify-center pb-6">
                 <button onClick={() => clearChat()} className="text-[9px] tracking-[0.3em] uppercase text-luxury-charcoal/30 hover:text-luxury-charcoal transition border-b border-transparent hover:border-luxury-charcoal pb-1">
@@ -185,7 +127,44 @@ export default function FloatingBarista() {
                     {m.role === 'user' ? 'Master' : 'Maid'}
                   </div>
                   <div className={`p-4 text-sm font-light leading-relaxed shadow-sm ${m.role === 'user' ? 'bg-luxury-charcoal text-luxury-cream rounded-bl-2xl rounded-tl-2xl rounded-tr-2xl' : 'bg-white/95 border border-luxury-charcoal/10 rounded-br-2xl rounded-tr-2xl rounded-tl-2xl'}`}>
-                    {renderMessageContent(m.content, m.role)}
+                    <ReactMarkdown 
+                      className="prose prose-sm max-w-none prose-p:leading-relaxed"
+                      components={{
+                        a: ({node, ...props}) => {
+                          return (
+                            <a 
+                              {...props}
+                              href={props.href}
+                              onClick={(e) => {
+                                e.preventDefault();
+                                const href = props.href || '';
+                                if (href === '#menu' || href.includes('menu')) {
+                                  navigate('/menu');
+                                  setIsOpen(false);
+                                } else {
+                                  // Extract ID from #m1
+                                  const idMatch = href.match(/#([mcst]\d)/i) || href.match(/([mcst]\d)/i);
+                                  if (idMatch) {
+                                    const item = menuData.find(menu => menu.id.toLowerCase() === idMatch[1].toLowerCase());
+                                    if (item) {
+                                      addItem(item);
+                                      return;
+                                    }
+                                  }
+                                  // Fallback toggle cart
+                                  useCartStore.getState().toggleCart();
+                                }
+                              }}
+                              className="inline-flex items-center gap-1 font-medium text-luxury-matcha hover:text-[#3d6530] border-b border-luxury-matcha/30 hover:border-luxury-matcha transition-colors cursor-pointer"
+                            >
+                              {props.children}
+                            </a>
+                          )
+                        }
+                      }}
+                    >
+                      {m.content}
+                    </ReactMarkdown>
                   </div>
                 </div>
               ))}
@@ -196,7 +175,6 @@ export default function FloatingBarista() {
               )}
             </div>
 
-            {/* Input Area */}
             <div className="p-4 bg-white/50 border-t border-luxury-charcoal/10 z-10">
               <div className="flex gap-4 border border-luxury-charcoal/20 focus-within:border-luxury-matcha transition-colors rounded-full px-5 py-3 bg-white shadow-sm">
                 <input 
