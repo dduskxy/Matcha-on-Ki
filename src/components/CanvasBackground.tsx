@@ -61,8 +61,8 @@ export default function CanvasBackground() {
         <ZenStones />
         
         <Environment preset="city" />
-        {/* Reduced ContactShadows resolution and frequency for massive FPS boost */}
-        <ContactShadows position={[0, -2.5, 0]} opacity={0.3} scale={20} blur={2.5} far={4.5} resolution={256} frames={1} />
+        {/* ContactShadows without frames=1 so shadow updates as stones rotate */}
+        <ContactShadows position={[0, -2.5, 0]} opacity={0.3} scale={20} blur={2.5} far={4.5} resolution={256} />
       </Canvas>
     </motion.div>
   );
