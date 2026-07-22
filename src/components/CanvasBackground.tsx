@@ -3,6 +3,7 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { motion } from 'framer-motion';
 import { Float, Environment, ContactShadows, Sparkles, OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
+import BambooLeaves from './BambooLeaves';
 
 const ZenStones = () => {
   const groupRef = useRef<THREE.Group>(null);
