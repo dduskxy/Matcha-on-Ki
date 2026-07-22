@@ -79,7 +79,7 @@ const SingleLeaf = ({ leaf, geometry }: { leaf: any, geometry: THREE.BufferGeome
   );
 };
 
-export default function BambooLeaves({ count = 60 }) {
+export default function BambooLeaves({ count = 15 }) {
   const leafGeometry = useMemo(() => createBambooLeafGeometry(), []);
   
   const leaves = useMemo(() => {
