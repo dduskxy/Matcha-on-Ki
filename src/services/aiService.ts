@@ -16,8 +16,15 @@ export const generateChatResponse = async (
     url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
     headers['x-goog-api-key'] = apiKey;
     
+    let geminiMessages = messages.map(m => ({ role: m.role === 'assistant' ? 'model' : 'user', parts: [{ text: m.content }] }));
+    
+    // Gemini API strictly requires the conversation history to start with a 'user' message.
+    if (geminiMessages.length > 0 && geminiMessages[0].role === 'model') {
+      geminiMessages.unshift({ role: 'user', parts: [{ text: 'Start conversation' }] });
+    }
+
     payload = {
-      contents: messages.map(m => ({ role: m.role === 'assistant' ? 'model' : 'user', parts: [{ text: m.content }] })),
+      contents: geminiMessages,
       systemInstruction: { parts: [{ text: systemPrompt }] }
     };
   } else if (provider === 'groq') {
