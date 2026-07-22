@@ -1,7 +1,7 @@
 import { useRef } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 
-import { OrbitControls, Sparkles, ContactShadows, Environment } from '@react-three/drei';
+import { OrbitControls, Sparkles, ContactShadows, Environment, MeshTransmissionMaterial } from '@react-three/drei';
 import * as THREE from 'three';
 import BambooLeaves from './BambooLeaves';
 
@@ -17,33 +17,49 @@ const ZenStones = () => {
 
   return (
     <group ref={groupRef} position={[0, -0.5, 0]} scale={1.3}>
-      {/* Bottom Stone (Dark Basalt) */}
+      {/* Bottom Stone (Polished Obsidian) */}
       <mesh position={[0, -0.8, 0]} rotation={[0.05, 0.2, -0.05]} scale={[1.7, 0.5, 1.6]} castShadow receiveShadow>
         <sphereGeometry args={[1, 64, 64]} />
-        <meshStandardMaterial 
-          color="#3a3b3c" 
-          roughness={0.85} 
-          metalness={0.0} 
+        <meshPhysicalMaterial 
+          color="#1a1a1c" 
+          roughness={0.3} 
+          metalness={0.2}
+          clearcoat={1.0}
+          clearcoatRoughness={0.1}
         />
       </mesh>
       
-      {/* Middle Stone (Muted Jade) */}
+      {/* Middle Stone (Matcha Jade) */}
       <mesh position={[0.05, -0.1, 0.05]} rotation={[-0.1, -0.4, 0.05]} scale={[1.4, 0.4, 1.3]} castShadow receiveShadow>
         <sphereGeometry args={[1, 64, 64]} />
-        <meshStandardMaterial 
-          color="#7c8f76" 
-          roughness={0.75} 
-          metalness={0.0}
+        <meshPhysicalMaterial 
+          color="#5e7a53" 
+          roughness={0.2} 
+          metalness={0.1}
+          clearcoat={1.0}
+          clearcoatRoughness={0.2}
+          transmission={0.2}
+          thickness={0.5}
         />
       </mesh>
 
-      {/* Top Stone (Warm Sandstone) */}
+      {/* Top Stone (Frosted Quartz / Glass) */}
       <mesh position={[-0.05, 0.4, -0.05]} rotation={[0.1, 0.5, -0.1]} scale={[0.8, 0.3, 0.7]} castShadow receiveShadow>
         <sphereGeometry args={[1, 64, 64]} />
-        <meshStandardMaterial 
-          color="#a8a29e" 
-          roughness={0.9} 
-          metalness={0.0} 
+        <MeshTransmissionMaterial 
+          backside
+          samples={4}
+          thickness={1.5}
+          chromaticAberration={0.05}
+          anisotropy={0.1}
+          distortion={0.2}
+          distortionScale={0.3}
+          temporalDistortion={0.1}
+          clearcoat={1}
+          attenuationDistance={0.5}
+          attenuationColor="#ffffff"
+          color="#f5f7fa"
+          roughness={0.1}
         />
       </mesh>
     </group>
