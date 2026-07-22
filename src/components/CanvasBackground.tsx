@@ -1,7 +1,7 @@
 import { useRef } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { motion } from 'framer-motion';
-import { Float, Environment, ContactShadows, Sparkles, PresentationControls } from '@react-three/drei';
+import { Float, Environment, ContactShadows, Sparkles, OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
 
 const ZenStones = () => {
@@ -90,17 +90,19 @@ export default function CanvasBackground() {
         <Sparkles count={120} scale={15} size={1.5} speed={0.2} opacity={0.8} color="#4A7A3A" />
         <Sparkles count={80} scale={20} size={3} speed={0.1} opacity={0.6} color="#FFFFFF" />
 
-        {/* Interactive Premium Presentation */}
-        <PresentationControls 
-          global 
-          zoom={1.1} 
-          rotation={[0, 0, 0]} 
-          polar={[-0.2, 0.2]} 
-          azimuth={[-0.5, 0.5]} 
-          snap={true}
-        >
-          <ZenStones />
-        </PresentationControls>
+        {/* Interactive Premium Presentation - Switched to OrbitControls for 100% stability */}
+        <OrbitControls 
+          enableZoom={false}
+          enablePan={false}
+          minPolarAngle={Math.PI / 2 - 0.2}
+          maxPolarAngle={Math.PI / 2 + 0.2}
+          minAzimuthAngle={-0.5}
+          maxAzimuthAngle={0.5}
+          enableDamping={true}
+          dampingFactor={0.05}
+        />
+        
+        <ZenStones />
         
         <ZenRipple />
         
