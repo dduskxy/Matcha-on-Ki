@@ -10,7 +10,7 @@ export default function ApiKeyManager() {
   // Automatically lock to Gemini and the latest model on load
   useEffect(() => {
     setSelectedProvider('gemini');
-    setSelectedModel('gemini-3.6-flash');
+    setSelectedModel('gemini-1.5-flash');
   }, [setSelectedProvider, setSelectedModel]);
 
   const handleVerifyAndSave = async () => {
@@ -19,7 +19,7 @@ export default function ApiKeyManager() {
     
     try {
       // Test the key by sending a tiny prompt to the Gemini API
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent`;
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent`;
       const headers: any = { 'Content-Type': 'application/json' };
       
       headers['x-goog-api-key'] = inputKey;
