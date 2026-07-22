@@ -46,13 +46,13 @@ export default function Preloader() {
             style={{ willChange: "opacity" }}
             className="flex flex-col items-center gap-4"
           >
-            <div className="text-[10px] tracking-[0.4em] uppercase text-luxury-charcoal/60">
+            <div className="text-[10px] tracking-[0.4em] uppercase text-luxury-charcoal/60 pl-[0.4em]">
               Brewing...
             </div>
             {/* Ultra Minimal progress bar */}
             <div className="w-12 h-[1px] bg-luxury-charcoal/5 relative overflow-hidden mt-2">
               <motion.div 
-                className="absolute top-0 left-0 h-full w-full bg-luxury-matcha/80 origin-left"
+                className="absolute top-0 left-0 h-full w-full bg-luxury-matcha/80 origin-center"
                 style={{ willChange: "transform" }}
                 animate={{ scaleX: progress / 100 }}
                 transition={{ ease: "easeOut", duration: 0.3 }}
