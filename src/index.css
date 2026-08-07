@@ -17,9 +17,7 @@
   }
   
   @media (pointer: fine) {
-    body, a, button, input {
-      cursor: none !important;
-    }
+    /* Kept native cursor for better multi-window UX */
   }
   
   h1, h2, h3, h4, h5, h6 {

@@ -9,6 +9,7 @@ export type MenuItem = {
   origin: string;
   brewTemp: string;
   tastingNotes: string[];
+  isSoldOut?: boolean;
 };
 
 export const menuData: MenuItem[] = [

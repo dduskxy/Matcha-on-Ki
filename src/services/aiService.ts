@@ -50,7 +50,7 @@ export const generateChatResponse = async (
     try {
       const errData = await res.json();
       errMsg = errData.error?.message || JSON.stringify(errData);
-    } catch(e) {
+    } catch {
       errMsg = await res.text();
     }
     throw new Error(`API Error ${res.status}: ${errMsg}`);

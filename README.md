@@ -1,32 +1,47 @@
-# React + TypeScript + Vite
+# Matcha no Ki 🍵✨
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+A luxury Japanese matcha cafe concept website built with React, Vite, and Tailwind CSS.
+Experience the perfect blend of traditional Zen aesthetics and modern web technologies.
 
-Currently, two official plugins are available:
+## ✨ Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **Immersive 3D Experience**: Falling bamboo leaves using React Three Fiber.
+- **Dynamic Real-time Menu**: Real-time cross-tab synchronization for menu prices and availability.
+- **Matcha Maid AI**: An integrated LLM-powered chatbot that acts as your personal cafe maid, fully aware of real-time menu updates (Powered by Google Gemini).
+- **Luxury UI/UX**: Smooth scrolling (Lenis), custom cursor aura, and elegant page transitions (Framer Motion).
+- **Cross-Tab Cart Sync**: Shopping cart automatically syncs across all open tabs.
+- **Secure Admin Dashboard**: A beautifully crafted dark-mode admin terminal for live data management.
 
-## React Compiler
+## 🚀 Technologies
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **Frontend**: React 18, Vite, TypeScript
+- **Styling**: Tailwind CSS v4, Lucide React (Icons)
+- **Animation & 3D**: Framer Motion, Three.js, React Three Fiber
+- **State Management**: Zustand
+- **AI Integration**: Google Generative AI (Gemini)
 
-## Expanding the Oxlint configuration
+## 📦 Installation & Setup
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/Matcha-on-Ki.git
+   ```
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Run the development server:
+   ```bash
+   npm run dev
+   ```
 
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+## 🛠️ Admin Access
+Type `admin` anywhere on the website (without focusing an input box) to access the Restricted Management Terminal.
+Default Passcode: `matcha2024`
+
+## 🌐 Deployment (GitHub Pages)
+This project is configured for GitHub Pages deployment.
+```bash
+npm run build
 ```
-
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+The output will be in the `dist` folder, ready to be served.

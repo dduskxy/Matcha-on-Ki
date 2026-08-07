@@ -1,8 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
-import { useChatStore } from '../store/useChatStore';
+import { useChatStore, getSystemPrompt } from '../store/useChatStore';
 import { useSettingsStore } from '../store/useSettingsStore';
 import { useCartStore } from '../store/useCartStore';
-import { menuData } from '../data/menuData';
+import { useMenuStore } from '../store/useMenuStore';
 import { generateChatResponse } from '../services/aiService';
 import { Loader2, X, Settings, Leaf } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
@@ -16,7 +16,7 @@ export default function FloatingBarista() {
   const navigate = useNavigate();
   const lenis = useLenis();
   
-  const { messages, addMessage, clearChat, systemPrompt } = useChatStore();
+  const { messages, addMessage, clearChat } = useChatStore();
   const { apiKeys, selectedProvider, selectedModel } = useSettingsStore();
   const { addItem, isCartOpen } = useCartStore();
   const [input, setInput] = useState('');
@@ -71,7 +71,7 @@ export default function FloatingBarista() {
     try {
       const history = messages.map(m => ({ role: m.role, content: m.content })).concat({ role: 'user', content: userText });
       const responseText = await generateChatResponse(
-        history, systemPrompt, apiKeys[selectedProvider], selectedProvider, selectedModel, abortControllerRef.current.signal
+        history, getSystemPrompt(), apiKeys[selectedProvider], selectedProvider, selectedModel, abortControllerRef.current.signal
       );
       addMessage({ id: (Date.now()+1).toString(), role: 'assistant', content: responseText, timestamp: Date.now() });
     } catch (error: any) {
@@ -140,7 +140,7 @@ export default function FloatingBarista() {
                     <div className="prose prose-sm max-w-none prose-p:leading-relaxed">
                       <ReactMarkdown 
                         components={{
-                        a: ({node, ...props}: any) => {
+                        a: ({...props}: any) => {
                           return (
                             <a 
                               {...props}
@@ -155,7 +155,8 @@ export default function FloatingBarista() {
                                   // Extract ID from #m1
                                   const idMatch = href.match(/#([mcst]\d)/i) || href.match(/([mcst]\d)/i);
                                   if (idMatch) {
-                                    const item = menuData.find(menu => menu.id.toLowerCase() === idMatch[1].toLowerCase());
+                                    const items = useMenuStore.getState().items;
+                                    const item = items.find(menu => menu.id.toLowerCase() === idMatch[1].toLowerCase());
                                     if (item) {
                                       addItem(item);
                                       return;

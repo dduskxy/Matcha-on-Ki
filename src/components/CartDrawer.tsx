@@ -1,11 +1,24 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCartStore } from '../store/useCartStore';
+import { useMenuStore } from '../store/useMenuStore';
 import { X, Minus, Plus, ShoppingBag } from 'lucide-react';
 
 export default function CartDrawer() {
   const { items, isCartOpen, toggleCart, updateQuantity, removeItem } = useCartStore();
+  const menuItems = useMenuStore(state => state.items);
 
-  const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  // Map cart items to real-time menu items
+  const activeCartItems = items.map(cartItem => {
+    const liveItem = menuItems.find(m => m.id === cartItem.id);
+    return {
+      ...cartItem,
+      price: liveItem?.price ?? cartItem.price,
+      name: liveItem?.name ?? cartItem.name,
+      jpName: liveItem?.jpName ?? cartItem.jpName,
+    };
+  });
+
+  const total = activeCartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
   return (
     <AnimatePresence>
@@ -42,7 +55,7 @@ export default function CartDrawer() {
                   <p className="font-light tracking-widest uppercase text-sm">Your order is empty</p>
                 </div>
               ) : (
-                items.map(item => (
+                activeCartItems.map(item => (
                   <div key={item.id} className="flex gap-4 items-center bg-white p-4 rounded-xl border border-luxury-charcoal/5">
                     <div className="flex-1">
                       <h3 className="font-serif text-lg text-luxury-charcoal">{item.name}</h3>
@@ -65,7 +78,7 @@ export default function CartDrawer() {
               )}
             </div>
 
-            {items.length > 0 && (
+            {activeCartItems.length > 0 && (
               <div className="p-6 bg-white border-t border-luxury-charcoal/10">
                 <div className="flex justify-between items-end mb-6 text-luxury-charcoal">
                   <span className="font-light tracking-widest uppercase text-sm">Total</span>

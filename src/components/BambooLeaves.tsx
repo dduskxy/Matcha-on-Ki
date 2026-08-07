@@ -78,12 +78,11 @@ const SingleLeaf = ({ leaf, geometry }: { leaf: any, geometry: THREE.BufferGeome
     </mesh>
   );
 };
+const leafColors = ['#2c4217', '#466329', '#5a8232', '#709940', '#3b5420'];
 
-export default function BambooLeaves({ count = 25 }) {
+export default function BambooLeaves({ count = 50 }: { count?: number }) {
   const leafGeometry = useMemo(() => createBambooLeafGeometry(), []);
   
-  const leafColors = ['#2c4217', '#466329', '#5a8232', '#709940', '#3b5420'];
-
   const leaves = useMemo(() => {
     return new Array(count).fill(0).map(() => {
       // Exaggerated scale: heavily bias towards smaller background leaves, with a few massive foreground ones

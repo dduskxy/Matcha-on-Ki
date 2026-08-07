@@ -25,7 +25,7 @@ export default function ApiKeyManager() {
       setInputKey('');
       setStatus('success');
       setTimeout(() => setStatus('idle'), 3000);
-    } catch (e: any) {
+    } catch {
       setStatus('error');
     }
   };

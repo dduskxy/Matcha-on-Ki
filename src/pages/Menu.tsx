@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { menuData, type MenuItem } from '../data/menuData';
+import { type MenuItem } from '../data/menuData';
+import { useMenuStore } from '../store/useMenuStore';
 import { Coffee, GlassWater, Leaf, Circle, Plus } from 'lucide-react';
 import { motion, AnimatePresence, type Variants } from 'framer-motion';
 import { useCartStore } from '../store/useCartStore';
@@ -49,24 +50,25 @@ export default function Menu() {
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
   const addItem = useCartStore(state => state.addItem);
   const [searchParams] = useSearchParams();
+  const menuItems = useMenuStore(state => state.items);
 
   useEffect(() => {
     const itemId = searchParams.get('item');
     if (itemId) {
-      const item = menuData.find(m => m.id === itemId);
+      const item = menuItems.find(m => m.id === itemId);
       if (item) {
         setSelectedItem(item);
         // Optionally clear the query param after opening so it doesn't reopen on next render
         // setSearchParams({}); 
       }
     }
-  }, [searchParams]);
+  }, [searchParams, menuItems]);
 
   const categories = ['All', 'Matcha', 'Coffee', 'Tea', 'Sweets'] as const;
   
   const filteredMenu = activeCategory === 'All' 
-    ? menuData 
-    : menuData.filter(item => item.category === activeCategory);
+    ? menuItems 
+    : menuItems.filter(item => item.category === activeCategory);
 
   const renderIcon = (type: string) => {
     const props = { strokeWidth: 0.5, className: "w-20 h-20 opacity-50 group-hover:opacity-100 transition-all duration-700" };
@@ -123,18 +125,27 @@ export default function Menu() {
                 whileInView="show"
                 viewport={{ once: true, margin: "-50px" }}
                 key={item.id} 
-                onClick={() => setSelectedItem(item)}
-                className="group cursor-pointer flex gap-10 items-center border-b border-transparent hover:border-luxury-charcoal/30 pb-6 transition-all duration-700"
+                onClick={() => !item.isSoldOut && setSelectedItem(item)}
+                className={`group flex gap-10 items-center border-b border-transparent pb-6 transition-all duration-700 ${
+                  item.isSoldOut 
+                    ? 'opacity-40 cursor-not-allowed grayscale' 
+                    : 'cursor-pointer hover:border-luxury-charcoal/30'
+                }`}
               >
                 {/* 2D Model Icon */}
                 <div className="w-24 flex-shrink-0 flex items-center justify-center text-luxury-matcha">
                   {renderIcon(item.icon)}
                 </div>
                 
-                <div className="flex-grow">
+                <div className="flex-grow relative">
                   <div className="flex justify-between items-baseline mb-2">
-                    <h3 className="font-serif text-xl text-luxury-charcoal tracking-wide group-hover:text-luxury-matcha transition-colors duration-500">{item.name}</h3>
-                    <span className="text-sm tracking-wider font-light text-luxury-charcoal/80">{item.price} ฿</span>
+                    <h3 className={`font-serif text-xl tracking-wide transition-colors duration-500 ${item.isSoldOut ? 'text-luxury-charcoal/50' : 'text-luxury-charcoal group-hover:text-luxury-matcha'}`}>{item.name}</h3>
+                    <div className="flex items-center gap-3">
+                      {item.isSoldOut && (
+                        <span className="text-[8px] bg-red-900/10 text-red-700 border border-red-900/20 px-2 py-0.5 rounded-sm tracking-widest uppercase font-medium">Sold Out</span>
+                      )}
+                      <span className="text-sm tracking-wider font-light text-luxury-charcoal/80">{item.price} ฿</span>
+                    </div>
                   </div>
                   <div className="text-[10px] text-luxury-charcoal/70 tracking-[0.3em] uppercase mb-3">{item.jpName}</div>
                   <p className="text-xs text-luxury-charcoal/80 font-light leading-relaxed max-w-[250px] opacity-0 group-hover:opacity-100 transition-opacity duration-700 absolute md:relative">
