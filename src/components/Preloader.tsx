@@ -7,13 +7,22 @@ export default function Preloader() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Keep loading screen up slightly longer. If total === 0, there are no external assets to load.
+    // Guaranteed dismiss timer (maximum 1.5s)
+    const safetyTimer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1500);
+
     if (!active && (progress === 100 || total === 0)) {
       const timer = setTimeout(() => {
         setIsLoading(false);
-      }, 1500); 
-      return () => clearTimeout(timer);
+      }, 800);
+      return () => {
+        clearTimeout(timer);
+        clearTimeout(safetyTimer);
+      };
     }
+
+    return () => clearTimeout(safetyTimer);
   }, [active, progress, total]);
 
   return (
@@ -22,7 +31,7 @@ export default function Preloader() {
         <motion.div
           initial={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 1.5, ease: "linear" }}
+          transition={{ duration: 0.8, ease: "linear" }}
           className="fixed inset-0 z-[9999] bg-luxury-cream flex flex-col items-center justify-center cursor-wait"
         >
           <div className="overflow-hidden mb-6">
@@ -39,16 +48,16 @@ export default function Preloader() {
           <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.5, duration: 1 }}
+            transition={{ delay: 0.3, duration: 0.8 }}
             className="flex flex-col items-center mt-6"
           >
-            {/* Ultra Minimal progress bar */}
+            {/* Minimal progress bar */}
             <div className="w-64 h-[1px] bg-luxury-charcoal/10 relative overflow-hidden">
               <motion.div 
                 className="absolute top-0 left-0 h-full w-full bg-luxury-charcoal origin-left"
                 initial={{ scaleX: 0 }}
-                animate={{ scaleX: (total === 0 && !active) ? 1 : progress / 100 }}
-                transition={{ ease: [0.76, 0, 0.24, 1], duration: 0.8 }}
+                animate={{ scaleX: (total === 0 && !active) ? 1 : Math.max(progress / 100, 0.2) }}
+                transition={{ ease: [0.76, 0, 0.24, 1], duration: 0.5 }}
               />
             </div>
           </motion.div>
