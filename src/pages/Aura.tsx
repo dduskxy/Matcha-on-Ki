@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { useCartStore } from '../store/useCartStore';
 
 type VibeType = 'scanning' | 'matcha' | 'hojicha' | 'sakura' | 'night' | 'day';
@@ -10,6 +10,20 @@ export default function Aura() {
   const [foundSakura, setFoundSakura] = useState(false);
   const foundSakuraRef = useRef(false);
   
+  // Real-time Aura color springs
+  const rSync = useMotionValue(242);
+  const gSync = useMotionValue(239);
+  const bSync = useMotionValue(233);
+  
+  const rSpring = useSpring(rSync, { stiffness: 50, damping: 20 });
+  const gSpring = useSpring(gSync, { stiffness: 50, damping: 20 });
+  const bSpring = useSpring(bSync, { stiffness: 50, damping: 20 });
+  
+  const auraBackground = useTransform(
+    [rSpring, gSpring, bSpring],
+    ([r, g, b]) => `radial-gradient(circle at 50% 40%, rgba(${Math.round(r as number)}, ${Math.round(g as number)}, ${Math.round(b as number)}, 0.4) 0%, transparent 70%)`
+  );
+
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -95,10 +109,18 @@ export default function Aura() {
     let brownCount = 0;
     let pinkCount = 0;
     
+    let sumR = 0, sumG = 0, sumB = 0;
+    let pixelCount = 0;
+    
     for (let i = 0; i < data.length; i += 16) { 
       const r = data[i];
       const g = data[i+1];
       const b = data[i+2];
+      
+      sumR += r;
+      sumG += g;
+      sumB += b;
+      pixelCount++;
       
       const luma = 0.299 * r + 0.587 * g + 0.114 * b;
       totalBrightness += luma;
@@ -110,6 +132,12 @@ export default function Aura() {
     }
     
     const avgBrightness = totalBrightness / (data.length / 16);
+    
+    if (pixelCount > 0) {
+      rSync.set(sumR / pixelCount);
+      gSync.set(sumG / pixelCount);
+      bSync.set(sumB / pixelCount);
+    }
     
     if (pinkCount > 50 && !foundSakuraRef.current) {
       foundSakuraRef.current = true;
@@ -325,9 +353,19 @@ export default function Aura() {
         color: currentStyles.text 
       }}
       transition={{ duration: 2, ease: 'easeInOut' }}
-      className="min-h-screen pt-32 pb-20"
+      className="min-h-screen pt-32 pb-20 relative overflow-hidden"
     >
-      {renderContent()}
+      {/* Real-time Glowing Aura */}
+      {hasPermission && (
+        <motion.div 
+          style={{ background: auraBackground }}
+          className="absolute inset-0 z-0 pointer-events-none opacity-60"
+        />
+      )}
+      
+      <div className="relative z-10">
+        {renderContent()}
+      </div>
     </motion.div>
   );
 }
