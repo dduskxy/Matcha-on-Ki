@@ -12,23 +12,27 @@ export const GlobalHandCursor: React.FC = () => {
   const circleRef = useRef<SVGCircleElement>(null);
   const dotRef = useRef<HTMLDivElement>(null);
   const scrollIconRef = useRef<SVGSVGElement>(null);
-  
   const hoverStartTime = useRef<number | null>(null);
   const hoveredElement = useRef<HTMLElement | null>(null);
-  
-  
 
   useEffect(() => {
     let handLandmarker: HandLandmarker;
     let animationFrameId: number;
     let lastVideoTime = -1;
     let stream: MediaStream | null = null;
-    
-    // Lerp state
     let currentX = window.innerWidth / 2;
     let currentY = window.innerHeight / 2;
-    let lastHandY = -1;
     let frameCount = 0;
+
+    const GESTURE_COOLDOWN_MS = 4000;
+    const HOLD_MS = 600;
+    let lastHollowPurpleTime = 0;
+    let lastMalevolentShrineTime = 0;
+    let hollowPurpleHoldStart = 0;
+    let malevolentShrineHoldStart = 0;
+
+    const getDist = (p1: any, p2: any) =>
+      Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2));
 
     const initializeHandDetection = async () => {
       try {
@@ -37,233 +41,163 @@ export const GlobalHandCursor: React.FC = () => {
         );
         handLandmarker = await HandLandmarker.createFromOptions(vision, {
           baseOptions: {
-            modelAssetPath: 'https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task',
-            delegate: 'GPU'
+            modelAssetPath:
+              'https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task',
+            delegate: 'GPU',
           },
           runningMode: 'VIDEO',
-          numHands: 1
+          numHands: 1,
         });
-
         stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: 'user', width: 640, height: 480 }
+          video: { facingMode: 'user', width: 640, height: 480 },
         });
-
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
-          videoRef.current.addEventListener('loadeddata', () => {
-            
-            predictWebcam();
-          });
+          videoRef.current.addEventListener('loadeddata', predictWebcam);
         }
       } catch (err) {
-        console.error('Error initializing hand tracking:', err);
+        console.error('Hand tracking init error:', err);
       }
+    };
+
+    const setCursorRing = (offset: number, stroke: string) => {
+      if (!circleRef.current) return;
+      circleRef.current.style.stroke = stroke;
+      circleRef.current.style.strokeDashoffset = String(offset);
     };
 
     const predictWebcam = () => {
       if (!videoRef.current || !handLandmarker) return;
-
-      const startTimeMs = performance.now();
+      const now = performance.now();
       if (lastVideoTime !== videoRef.current.currentTime) {
         lastVideoTime = videoRef.current.currentTime;
-        const results = handLandmarker.detectForVideo(videoRef.current, startTimeMs);
+        const results = handLandmarker.detectForVideo(videoRef.current, now);
 
         if (results.landmarks && results.landmarks.length > 0) {
-          const landmarks = results.landmarks[0];
-          const indexTip = landmarks[8];
-          const indexPip = landmarks[6];
-          const middleTip = landmarks[12];
-          const middlePip = landmarks[10];
-          const ringTip = landmarks[16];
-          const ringPip = landmarks[14];
+          const lm = results.landmarks[0];
+          const indexTip = lm[8], indexPip = lm[6];
+          const middleTip = lm[12], middlePip = lm[10];
+          const ringTip = lm[16], ringPip = lm[14];
+          const pinkyTip = lm[20], pinkyPip = lm[18];
+          const thumbTip = lm[4], thumbMcp = lm[2];
+          const wrist = lm[0];
 
-          // 1. High-Sensitivity 1-Finger Control
-          // Map an inner bounding box (0.3 to 0.7) to the full screen
-          const innerBoxStart = 0.3;
-          const innerBoxSize = 0.4;
-          
-          const rawX = 1 - indexTip.x; // Mirror X
-          const rawY = indexTip.y;
-          
-          const mappedX = Math.max(0, Math.min(1, (rawX - innerBoxStart) / innerBoxSize));
-          const mappedY = Math.max(0, Math.min(1, (rawY - innerBoxStart) / innerBoxSize));
-          
-          const targetX = mappedX * window.innerWidth;
-          const targetY = mappedY * window.innerHeight;
-
-          // 2. Smooth Cursor (Lerp)
-          currentX += (targetX - currentX) * 0.2;
-          currentY += (targetY - currentY) * 0.2;
-
+          const IBS = 0.3, ISZ = 0.4;
+          const mappedX = Math.max(0, Math.min(1, ((1 - indexTip.x) - IBS) / ISZ));
+          const mappedY = Math.max(0, Math.min(1, (indexTip.y - IBS) / ISZ));
+          currentX += (mappedX * window.innerWidth - currentX) * 0.2;
+          currentY += (mappedY * window.innerHeight - currentY) * 0.2;
           if (cursorRef.current) {
-            cursorRef.current.style.transform = `translate3d(${currentX}px, ${currentY}px, 0)`;
+            cursorRef.current.style.transform = `translate3d(${currentX}px,${currentY}px,0)`;
             cursorRef.current.style.opacity = '1';
           }
 
-          // 3. 2-Finger Scrolling Logic
-          // Check if index and middle are raised, but ring finger is down
-          const isIndexRaised = indexTip.y < indexPip.y;
-          const isMiddleRaised = middleTip.y < middlePip.y;
-          const isRingDown = ringTip.y > ringPip.y;
-          
-          // Check if index and middle tips are close to each other
-          const dx = indexTip.x - middleTip.x;
-          const dy = indexTip.y - middleTip.y;
-          const distance = Math.sqrt(dx * dx + dy * dy);
-          
-          const isScrolling = isIndexRaised && isMiddleRaised && isRingDown && distance < 0.1;
+          const C = 2 * Math.PI * 24;
 
-          if (isScrolling) {
-            if (lastHandY !== -1) {
-              const deltaY = rawY - lastHandY;
-              const scrollMultiplier = 3000;
-              window.scrollBy({ top: deltaY * scrollMultiplier, behavior: 'auto' });
-            }
-            lastHandY = rawY;
-            
-            // Disable hover logic
-            hoveredElement.current = null;
-            hoverStartTime.current = null;
-            if (circleRef.current) {
-              circleRef.current.style.strokeDashoffset = `${2 * Math.PI * 24}`;
-            }
+          // GESTURE 1: HOLLOW PURPLE (Gojo)
+          const isHP =
+            indexTip.y < indexPip.y &&
+            middleTip.y > middlePip.y &&
+            ringTip.y > ringPip.y &&
+            pinkyTip.y > pinkyPip.y &&
+            getDist(thumbTip, middleTip) < 0.1;
 
-            // Visual updates for scroll mode (blue dot + scroll icon)
-            if (dotRef.current) {
-              dotRef.current.classList.remove('bg-rose-500', 'shadow-[0_0_15px_rgba(244,63,94,0.6)]');
-              dotRef.current.classList.add('bg-blue-500', 'shadow-[0_0_15px_rgba(59,130,246,0.6)]');
-            }
-            if (scrollIconRef.current) {
-              scrollIconRef.current.style.opacity = '1';
+          if (isHP) {
+            if (hollowPurpleHoldStart === 0) hollowPurpleHoldStart = now;
+            const prog = Math.min((now - hollowPurpleHoldStart) / HOLD_MS, 1);
+            setCursorRing(C * (1 - prog), '#a855f7');
+            if (prog >= 1 && now - lastHollowPurpleTime > GESTURE_COOLDOWN_MS) {
+              lastHollowPurpleTime = now;
+              hollowPurpleHoldStart = 0;
+              window.dispatchEvent(new CustomEvent('hollow-purple'));
             }
           } else {
-            lastHandY = -1;
-            
-            // Visual updates for normal mode (rose dot, no icon)
-            if (dotRef.current) {
-              dotRef.current.classList.add('bg-rose-500', 'shadow-[0_0_15px_rgba(244,63,94,0.6)]');
-              dotRef.current.classList.remove('bg-blue-500', 'shadow-[0_0_15px_rgba(59,130,246,0.6)]');
-            }
-            if (scrollIconRef.current) {
-              scrollIconRef.current.style.opacity = '0';
-            }
+            hollowPurpleHoldStart = 0;
+          }
 
-            // Normal hover logic using lerped coordinates
+          // GESTURE 2: MALEVOLENT SHRINE (Sukuna)
+          const allOpen =
+            indexTip.y < indexPip.y &&
+            middleTip.y < middlePip.y &&
+            ringTip.y < ringPip.y &&
+            pinkyTip.y < pinkyPip.y &&
+            thumbTip.x < thumbMcp.x + 0.06;
+          const isSpread = getDist(indexTip, pinkyTip) > getDist(wrist, middleTip) * 0.55;
+          const isMS = allOpen && isSpread && !isHP;
+
+          if (isMS) {
+            if (malevolentShrineHoldStart === 0) malevolentShrineHoldStart = now;
+            const prog = Math.min((now - malevolentShrineHoldStart) / HOLD_MS, 1);
+            setCursorRing(C * (1 - prog), '#ef4444');
+            if (prog >= 1 && now - lastMalevolentShrineTime > GESTURE_COOLDOWN_MS) {
+              lastMalevolentShrineTime = now;
+              malevolentShrineHoldStart = 0;
+              window.dispatchEvent(new CustomEvent('malevolent-shrine'));
+            }
+          } else {
+            malevolentShrineHoldStart = 0;
+          }
+
+          // Idle hover/click
+          if (!isHP && !isMS) {
+            setCursorRing(C, '#f43f5e');
             frameCount++;
             if (frameCount % 5 === 0) {
-              const elementUnderCursor = document.elementFromPoint(currentX, currentY);
-              const clickable = elementUnderCursor?.closest(
-                'button, a, [role="button"], [data-clickable="true"]'
-              ) as HTMLElement | null;
-
+              const el = document.elementFromPoint(currentX, currentY);
+              const clickable = el?.closest('button,a,[role="button"],[data-clickable="true"]') as HTMLElement | null;
               if (clickable !== hoveredElement.current) {
                 hoveredElement.current = clickable;
-                if (clickable) {
-                  hoverStartTime.current = performance.now();
-                } else {
-                  hoverStartTime.current = null;
-                  if (circleRef.current) {
-                    circleRef.current.style.strokeDashoffset = `${2 * Math.PI * 24}`;
-                  }
-                }
+                hoverStartTime.current = clickable ? performance.now() : null;
+                if (!clickable) setCursorRing(C, '#f43f5e');
               }
             }
-
-            // Always update animation every frame if hovered
             if (hoveredElement.current && hoverStartTime.current) {
-              const elapsed = performance.now() - hoverStartTime.current;
-              const progress = Math.min(elapsed / 2000, 1);
-              
-              if (circleRef.current) {
-                const circumference = 2 * Math.PI * 24;
-                circleRef.current.style.strokeDashoffset = `${circumference - progress * circumference}`;
-              }
-
-              if (progress === 1) {
+              const prog = Math.min((performance.now() - hoverStartTime.current) / 2000, 1);
+              setCursorRing(C * (1 - prog), '#f43f5e');
+              if (prog >= 1) {
                 hoveredElement.current.click();
-                hoverStartTime.current = null;
                 hoveredElement.current = null;
-                if (circleRef.current) {
-                  circleRef.current.style.strokeDashoffset = `${2 * Math.PI * 24}`;
-                }
+                hoverStartTime.current = null;
+                setCursorRing(C, '#f43f5e');
               }
             }
           }
         } else {
-          // No hands detected
           if (cursorRef.current) cursorRef.current.style.opacity = '0';
           hoveredElement.current = null;
           hoverStartTime.current = null;
-          lastHandY = -1;
-          if (circleRef.current) {
-            circleRef.current.style.strokeDashoffset = `${2 * Math.PI * 24}`;
-          }
+          hollowPurpleHoldStart = 0;
+          malevolentShrineHoldStart = 0;
+          setCursorRing(2 * Math.PI * 24, '#f43f5e');
         }
       }
       animationFrameId = requestAnimationFrame(predictWebcam);
     };
 
     initializeHandDetection();
-
     return () => {
       if (animationFrameId) cancelAnimationFrame(animationFrameId);
       if (handLandmarker) handLandmarker.close();
-      if (stream) {
-        stream.getTracks().forEach((track) => track.stop());
-      }
+      if (stream) stream.getTracks().forEach((t) => t.stop());
     };
   }, []);
 
   return (
     <>
-      {/* Hidden Webcam Stream for Processing */}
-      <video 
-        ref={videoRef} onLoadedData={(e) => setVideoEl(e.currentTarget)} 
-        className="hidden" 
-        playsInline 
-        autoPlay 
-        muted 
-      />
-
-      {/* Hand Tracking Cursor */}
-      <div 
-        ref={cursorRef} 
-        className="fixed top-0 left-0 w-16 h-16 pointer-events-none z-[9999] flex items-center justify-center opacity-0 transition-opacity duration-300"
+      <video ref={videoRef} onLoadedData={(e) => setVideoEl(e.currentTarget)} className="hidden" playsInline autoPlay muted />
+      <div
+        ref={cursorRef}
+        className="fixed top-0 left-0 w-16 h-16 pointer-events-none z-[9999] flex items-center justify-center opacity-0"
         style={{ margin: '-32px 0 0 -32px', willChange: 'transform, opacity' }}
       >
-        <div 
-          ref={dotRef}
-          className="absolute w-4 h-4 bg-rose-500 rounded-full shadow-[0_0_15px_rgba(244,63,94,0.6)] transition-all duration-200" 
-        />
-        
-        {/* Scroll Icon Overlay */}
-        <svg
-          ref={scrollIconRef}
-          className="absolute w-6 h-6 text-white opacity-0 transition-opacity duration-200"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
-        </svg>
-
-        <svg width="64" height="64" className="absolute transform -rotate-90">
-          <circle
-            cx="32"
-            cy="32"
-            r="24"
-            stroke="rgba(244,63,94,0.2)"
-            strokeWidth="4"
-            fill="none"
-          />
+        <div ref={dotRef} className="absolute w-4 h-4 bg-rose-500 rounded-full shadow-[0_0_15px_rgba(244,63,94,0.6)]" />
+        <svg ref={scrollIconRef} className="absolute opacity-0 pointer-events-none" viewBox="0 0 24 24" />
+        <svg width="64" height="64" className="absolute -rotate-90">
+          <circle cx="32" cy="32" r="24" stroke="rgba(244,63,94,0.2)" strokeWidth="4" fill="none" />
           <circle
             ref={circleRef}
-            cx="32"
-            cy="32"
-            r="24"
-            stroke="#f43f5e"
-            strokeWidth="4"
-            fill="none"
+            cx="32" cy="32" r="24"
+            stroke="#f43f5e" strokeWidth="4" fill="none"
             strokeDasharray={2 * Math.PI * 24}
             strokeDashoffset={2 * Math.PI * 24}
           />

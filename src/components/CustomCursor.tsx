@@ -7,7 +7,7 @@ export default function CustomCursor() {
   const cursorY = useMotionValue(-100);
 
   // Smooth out the movement with a highly responsive, butter-smooth spring
-  const springConfig = { damping: 28, stiffness: 400, mass: 0.1 };
+  const springConfig = { damping: 35, stiffness: 800, mass: 0.05 };
   const smoothX = useSpring(cursorX, springConfig);
   const smoothY = useSpring(cursorY, springConfig);
 

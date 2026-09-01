@@ -1,4 +1,4 @@
-import { useRef, useMemo } from 'react';
+import { useRef, useMemo, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
@@ -24,61 +24,11 @@ const createBambooLeafGeometry = () => {
   return geometry;
 };
 
-const SingleLeaf = ({ leaf, geometry }: { leaf: any, geometry: THREE.BufferGeometry }) => {
-  const meshRef = useRef<THREE.Mesh>(null);
-
-  useFrame((state, delta) => {
-    if (!meshRef.current) return;
-    const time = state.clock.getElapsedTime();
-    const timeScale = Math.min(delta * 60, 2); // Cap delta to prevent massive jumps on tab switch
-
-    // falling down smoothly
-    leaf.y -= leaf.speed * timeScale;
-    
-    // loop back to top when they fall past the floor
-    if (leaf.y < -12) {
-      leaf.y = 15;
-      leaf.x = (Math.random() - 0.5) * 25;
-    }
-
-    // swaying side to side gently in the wind
-    const sway = Math.sin(time * leaf.swaySpeed + leaf.swayPhase) * 0.02 * timeScale;
-    leaf.x += sway;
-    leaf.z += sway * 0.3;
-
-    // Deflect away from the central Zen Stones (radius ~2.8) to prevent unrealistic clipping
-    const distToCenter = Math.sqrt(leaf.x * leaf.x + leaf.z * leaf.z);
-    if (distToCenter < 2.8 && leaf.y < 2.5 && leaf.y > -2.5) {
-      const pushForce = (2.8 - distToCenter) * 0.04 * timeScale;
-      // push outwards from center
-      const dirX = leaf.x === 0 ? 1 : leaf.x / distToCenter;
-      const dirZ = leaf.z === 0 ? 1 : leaf.z / distToCenter;
-      leaf.x += dirX * pushForce;
-      leaf.z += dirZ * pushForce;
-    }
-
-    // tumbling / rotating gently
-    leaf.rx += leaf.rs * timeScale;
-    leaf.ry += leaf.rySpeed * timeScale;
-    leaf.rz += leaf.rs * timeScale;
-
-    meshRef.current.position.set(leaf.x, leaf.y, leaf.z);
-    meshRef.current.rotation.set(leaf.rx, leaf.ry, leaf.rz);
-    meshRef.current.scale.setScalar(leaf.scale);
-  });
-
-  return (
-    <mesh ref={meshRef} geometry={geometry}>
-      <meshLambertMaterial 
-        color={leaf.color}
-        side={THREE.DoubleSide}
-      />
-    </mesh>
-  );
-};
 const leafColors = ['#2c4217', '#466329', '#5a8232', '#709940', '#3b5420'];
+const colorObj = new THREE.Color();
 
 export default function BambooLeaves({ count = 50 }: { count?: number }) {
+  const meshRef = useRef<THREE.InstancedMesh>(null);
   const leafGeometry = useMemo(() => createBambooLeafGeometry(), []);
   
   const leaves = useMemo(() => {
@@ -91,7 +41,7 @@ export default function BambooLeaves({ count = 50 }: { count?: number }) {
       return {
         x: (Math.random() - 0.5) * 25,
         y: Math.random() * 25 - 5,
-        z: (Math.random() - 0.5) * 15 - 2, // Push slightly back so they don't block the UI
+        z: (Math.random() - 0.5) * 15 - 2,
         scale: baseScale,
         color: randomColor,
         speed: Math.random() * 0.015 + 0.005,
@@ -106,11 +56,67 @@ export default function BambooLeaves({ count = 50 }: { count?: number }) {
     });
   }, [count]);
 
+  const dummy = useMemo(() => new THREE.Object3D(), []);
+
+  useEffect(() => {
+    if (meshRef.current) {
+      leaves.forEach((leaf, i) => {
+        colorObj.set(leaf.color);
+        meshRef.current!.setColorAt(i, colorObj);
+      });
+      meshRef.current.instanceColor!.needsUpdate = true;
+    }
+  }, [leaves]);
+
+  useFrame((state, delta) => {
+    if (!meshRef.current) return;
+    const time = state.clock.getElapsedTime();
+    const timeScale = Math.min(delta * 60, 2);
+
+    leaves.forEach((leaf, i) => {
+      // falling down smoothly
+      leaf.y -= leaf.speed * timeScale;
+      
+      // loop back to top
+      if (leaf.y < -12) {
+        leaf.y = 15;
+        leaf.x = (Math.random() - 0.5) * 25;
+      }
+
+      // swaying
+      const sway = Math.sin(time * leaf.swaySpeed + leaf.swayPhase) * 0.02 * timeScale;
+      leaf.x += sway;
+      leaf.z += sway * 0.3;
+
+      // deflect
+      const distToCenter = Math.sqrt(leaf.x * leaf.x + leaf.z * leaf.z);
+      if (distToCenter < 2.8 && leaf.y < 2.5 && leaf.y > -2.5) {
+        const pushForce = (2.8 - distToCenter) * 0.04 * timeScale;
+        const dirX = leaf.x === 0 ? 1 : leaf.x / distToCenter;
+        const dirZ = leaf.z === 0 ? 1 : leaf.z / distToCenter;
+        leaf.x += dirX * pushForce;
+        leaf.z += dirZ * pushForce;
+      }
+
+      // rotate
+      leaf.rx += leaf.rs * timeScale;
+      leaf.ry += leaf.rySpeed * timeScale;
+      leaf.rz += leaf.rs * timeScale;
+
+      dummy.position.set(leaf.x, leaf.y, leaf.z);
+      dummy.rotation.set(leaf.rx, leaf.ry, leaf.rz);
+      dummy.scale.setScalar(leaf.scale);
+      dummy.updateMatrix();
+
+      meshRef.current!.setMatrixAt(i, dummy.matrix);
+    });
+
+    meshRef.current.instanceMatrix.needsUpdate = true;
+  });
+
   return (
-    <group>
-      {leaves.map((leaf, idx) => (
-        <SingleLeaf key={idx} leaf={leaf} geometry={leafGeometry} />
-      ))}
-    </group>
+    <instancedMesh ref={meshRef} args={[leafGeometry, undefined, count]} frustumCulled={false}>
+      <meshLambertMaterial side={THREE.DoubleSide} />
+    </instancedMesh>
   );
 }

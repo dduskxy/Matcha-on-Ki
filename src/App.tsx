@@ -18,6 +18,9 @@ import Preloader from './components/Preloader';
 import LiveToast from './components/LiveToast';
 import GlobalHandCursor from './components/GlobalHandCursor';
 import { AtmosphereLayer } from './components/AtmosphereLayer';
+import HollowPurpleFeature from './components/HollowPurpleFeature';
+import MalevolentShrineFeature from './components/MalevolentShrineFeature';
+import SukunaGestureDetector from './components/SukunaGestureDetector';
 
 import { useEnvironmentStore } from './store/useEnvironmentStore';
 import { memo } from 'react';
@@ -28,20 +31,22 @@ const AppContent = memo(function AppContent() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Secret Admin Cheat Code (type 'admin' anywhere)
+  // Secret Cheat Codes (type anywhere, outside inputs)
   useEffect(() => {
+    const codes: Record<string, () => void> = {
+      'admin':  () => navigate('/admin'),
+      'sukuna': () => window.dispatchEvent(new Event('malevolent-shrine')),
+      'gojo':   () => window.dispatchEvent(new Event('hollow-purple')),
+    };
+    const maxLen = Math.max(...Object.keys(codes).map(k => k.length));
     let keys = '';
-    const secretCode = 'admin';
+
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
-      
       keys += e.key.toLowerCase();
-      if (keys.length > secretCode.length) {
-        keys = keys.slice(1);
-      }
-      if (keys === secretCode) {
-        navigate('/admin');
-        keys = '';
+      if (keys.length > maxLen) keys = keys.slice(keys.length - maxLen);
+      for (const [code, action] of Object.entries(codes)) {
+        if (keys.endsWith(code)) { action(); keys = ''; break; }
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -54,6 +59,8 @@ const AppContent = memo(function AppContent() {
       <LiveToast />
       <CustomCursor />
       <GlobalHandCursor />
+      <HollowPurpleFeature />
+      <MalevolentShrineFeature />
       <AtmosphereLayer />
       <CanvasBackground />
       <Navbar />
@@ -71,6 +78,7 @@ const AppContent = memo(function AppContent() {
       <Footer />
       <CartDrawer />
       <FloatingBarista />
+      <SukunaGestureDetector />
     </div>
   );
 });

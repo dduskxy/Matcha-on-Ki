@@ -9,9 +9,14 @@ export default function Home() {
     <PageTransition className="min-h-[100dvh] pt-32 pb-12 selection:bg-luxury-matcha selection:text-white relative overflow-hidden flex flex-col justify-end">
       
       {/* Background Japanese kanji (very faint) */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[40vh] md:text-[50vh] font-serif text-black/[0.015] pointer-events-none whitespace-nowrap z-[-1] select-none">
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.95, x: '-50%', y: '-50%' }}
+        animate={{ opacity: 1, scale: 1, x: '-50%', y: '-50%' }}
+        transition={{ duration: 2.5, ease: "easeOut" }}
+        className="absolute top-1/2 left-1/2 text-[40vh] md:text-[50vh] font-serif text-black/[0.015] pointer-events-none whitespace-nowrap z-[-1] select-none"
+      >
         抹茶の木
-      </div>
+      </motion.div>
 
       <div className="w-full max-w-7xl mx-auto px-6 md:px-12 relative z-10 flex flex-col items-start justify-end h-full flex-grow">
         

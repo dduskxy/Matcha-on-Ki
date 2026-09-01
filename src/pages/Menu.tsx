@@ -87,13 +87,25 @@ export default function Menu() {
       <div className="max-w-5xl mx-auto px-6">
         
         {/* Header */}
-        <div className="text-center mb-24">
+        <motion.div 
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-50px" }}
+          transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+          className="text-center mb-24"
+        >
           <h1 className="text-3xl md:text-5xl font-serif text-luxury-charcoal tracking-[0.2em] uppercase mb-4">お品書き</h1>
           <p className="text-xs tracking-[0.3em] uppercase text-luxury-charcoal/70">The Collection</p>
-        </div>
+        </motion.div>
 
         {/* Minimal Filters */}
-        <div className="flex flex-wrap justify-center gap-8 mb-24 border-b border-luxury-charcoal/5 pb-8">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-50px" }}
+          transition={{ duration: 1, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+          className="flex flex-wrap justify-center gap-8 mb-24 border-b border-luxury-charcoal/5 pb-8"
+        >
           {categories.map(cat => (
             <button 
               key={cat}
@@ -105,7 +117,7 @@ export default function Menu() {
               {cat}
             </button>
           ))}
-        </div>
+        </motion.div>
 
         {/* Ultra Minimal Grid List with Staggered Entrance */}
         <div className="min-h-[60vh]">

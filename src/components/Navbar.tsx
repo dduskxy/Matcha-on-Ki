@@ -8,21 +8,22 @@ const menuVariants: any = {
   closed: {
     opacity: 0,
     y: "-100%",
-    transition: { duration: 0.8, ease: "easeOut" }
+    transition: { duration: 0.8, ease: [0.76, 0, 0.24, 1] }
   },
   open: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.8, ease: "easeOut" }
+    transition: { duration: 0.8, ease: [0.76, 0, 0.24, 1] }
   }
 };
 
 const linkVariants: any = {
-  closed: { opacity: 0, y: 20 },
+  closed: { opacity: 0, y: 30, rotateX: 10 },
   open: (i: number) => ({
     opacity: 1, 
     y: 0,
-    transition: { delay: 0.3 + (i * 0.1), duration: 0.8, ease: "easeOut" }
+    rotateX: 0,
+    transition: { delay: 0.15 + (i * 0.08), duration: 0.8, ease: [0.76, 0, 0.24, 1] }
   })
 };
 
@@ -36,7 +37,7 @@ const Navbar = memo(function Navbar() {
       <motion.nav 
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 1.5, ease: [0.2, 0.8, 0.2, 1], delay: 0.5 }}
+        transition={{ duration: 1.2, ease: [0.76, 0, 0.24, 1], delay: 0.2 }}
         className="absolute top-0 w-full z-50 pt-10"
       >
         <div className="max-w-7xl mx-auto px-8 md:px-12 flex items-center justify-between">

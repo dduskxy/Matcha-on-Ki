@@ -13,18 +13,20 @@ export default function About() {
           <div className="absolute inset-0 bg-[radial-gradient(circle,rgba(252,251,248,0.95)_0%,rgba(252,251,248,0.8)_40%,rgba(252,251,248,0)_70%)] -z-10 rounded-full scale-[2]"></div>
           
           <motion.h1 
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, delay: 0.2 }}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
             className="text-3xl md:text-5xl font-serif text-luxury-charcoal tracking-[0.2em] uppercase mb-16 relative z-10"
           >
             Philosophy
           </motion.h1>
           
           <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 1, delay: 0.4 }}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 1, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
             className="space-y-12 text-sm md:text-base text-luxury-charcoal/90 font-light leading-loose relative z-10"
           >
             <p>
@@ -33,9 +35,23 @@ export default function About() {
             <p>
               Rooted in the ancient principles of Chado (The Way of Tea), we strive to bring harmony, respect, purity, and tranquility into the modern world. Every leaf is meticulously sourced from the misty hills of Uji, Kyoto—handpicked and stone-ground to preserve its purest essence.
             </p>
-            
-            <div className="w-px h-16 bg-gradient-to-b from-transparent via-luxury-matcha/50 to-transparent mx-auto my-12"></div>
-            
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            whileInView={{ opacity: 1, height: 64 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 1.2, delay: 0.3, ease: "easeInOut" }}
+            className="w-px bg-gradient-to-b from-transparent via-luxury-matcha/50 to-transparent mx-auto my-12"
+          ></motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 1, delay: 0.45, ease: [0.16, 1, 0.3, 1] }}
+            className="relative z-10"
+          >
             <h2 className="text-xl md:text-2xl font-serif text-luxury-charcoal tracking-widest uppercase mb-8">Location & Hours</h2>
             <p className="text-[10px] md:text-xs tracking-[0.2em] uppercase text-luxury-charcoal/80">
               123 Kyoto Street, Sukhumvit 49<br/>
