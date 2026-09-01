@@ -3,12 +3,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useCartStore } from '../store/useCartStore';
 import { menuData } from '../data/menuData';
 
-const KIOSK_ITEMS = [
-  menuData.find((m) => m.id === 'm1') || menuData[0], // Matcha Usucha
-  menuData.find((m) => m.id === 't3') || menuData[1], // Hojicha Latte
-  { ...(menuData.find((m) => m.id === 't2') || menuData[2]), name: 'Yuzu Sencha', jpName: '柚子煎茶', id: 'k-yuzu' }
-];
-
 const SCAN_MESSAGES = [
   "Calibrating sensors...",
   "Reading your aura...",
@@ -16,10 +10,17 @@ const SCAN_MESSAGES = [
   "Finding your perfect match..."
 ];
 
+// Helper to get random items
+const getRandomItems = (count: number) => {
+  const shuffled = [...menuData].sort(() => 0.5 - Math.random());
+  return shuffled.slice(0, count);
+};
+
 export const Kiosk: React.FC = () => {
   const [step, setStep] = useState<'idle' | 'scanning' | 'results'>('idle');
   const [scanMsgIdx, setScanMsgIdx] = useState(0);
   const [recommendedItem, setRecommendedItem] = useState<any>(null);
+  const [otherItems, setOtherItems] = useState<any[]>([]);
   const [feedback, setFeedback] = useState<string | null>(null);
   
   const addItem = useCartStore((state) => state.addItem);
@@ -42,9 +43,10 @@ export const Kiosk: React.FC = () => {
     // Finish scanning after 4 seconds
     setTimeout(() => {
       clearInterval(interval);
-      // Pick recommendation based on a pseudo-random factor (e.g. current millisecond to feel "calculated")
-      const randomItem = KIOSK_ITEMS[Date.now() % KIOSK_ITEMS.length];
-      setRecommendedItem(randomItem);
+      // Pick 4 random items
+      const selected = getRandomItems(4);
+      setRecommendedItem(selected[0]);
+      setOtherItems(selected.slice(1));
       setStep('results');
     }, 4000);
   };
@@ -184,7 +186,7 @@ export const Kiosk: React.FC = () => {
                   Or explore other options
                 </h4>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  {KIOSK_ITEMS.filter(item => item.id !== recommendedItem.id).map((item, idx) => (
+                  {otherItems.map((item, idx) => (
                     <motion.button
                       key={item.id}
                       onClick={() => handleItemClick(item)}
