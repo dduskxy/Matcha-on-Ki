@@ -18,16 +18,21 @@ export default function Aura() {
 
   const startCamera = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ 
-        video: { facingMode: 'environment' } 
-      });
-      streamRef.current = stream;
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        videoRef.current.play();
+      let stream: MediaStream;
+      try {
+        // Attempt to request the environment-facing camera first
+        stream = await navigator.mediaDevices.getUserMedia({ 
+          video: { facingMode: 'environment' } 
+        });
+      } catch (err) {
+        // Fallback to any available camera if 'environment' fails (e.g. PC or older device)
+        stream = await navigator.mediaDevices.getUserMedia({ 
+          video: true 
+        });
       }
+      
+      streamRef.current = stream;
       setHasPermission(true);
-      analyzeFrame();
     } catch (err) {
       console.error(err);
       setHasPermission(false);
@@ -37,16 +42,36 @@ export default function Aura() {
   const stopCamera = () => {
     if (streamRef.current) {
       streamRef.current.getTracks().forEach(track => track.stop());
+      streamRef.current = null;
     }
-    if (requestRef.current) cancelAnimationFrame(requestRef.current);
+    if (requestRef.current) {
+      cancelAnimationFrame(requestRef.current);
+      requestRef.current = 0;
+    }
   };
 
   useEffect(() => {
     return () => stopCamera();
   }, []);
 
+  // Reactively handle binding the stream and starting the analysis loop 
+  // once the permission is granted AND the DOM elements have mounted.
+  useEffect(() => {
+    if (hasPermission && videoRef.current && streamRef.current) {
+      videoRef.current.srcObject = streamRef.current;
+      videoRef.current.play().catch(console.error);
+      
+      requestRef.current = requestAnimationFrame(analyzeFrame);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hasPermission]);
+
   const analyzeFrame = () => {
-    if (!videoRef.current || !canvasRef.current) return;
+    if (!videoRef.current || !canvasRef.current) {
+      // Safely keep the loop alive even if refs temporarily unmount
+      requestRef.current = requestAnimationFrame(analyzeFrame);
+      return;
+    }
     
     const video = videoRef.current;
     const canvas = canvasRef.current;
@@ -57,7 +82,6 @@ export default function Aura() {
       return;
     }
 
-    // Draw video to canvas (scaled down for performance)
     canvas.width = 100;
     canvas.height = 100;
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
@@ -70,25 +94,22 @@ export default function Aura() {
     let brownCount = 0;
     let pinkCount = 0;
     
-    for (let i = 0; i < data.length; i += 16) { // Sample every 4th pixel
+    for (let i = 0; i < data.length; i += 16) { 
       const r = data[i];
       const g = data[i+1];
       const b = data[i+2];
       
-      // Luminance
       const luma = 0.299 * r + 0.587 * g + 0.114 * b;
       totalBrightness += luma;
       
-      // Color detection heuristics
-      if (g > r * 1.2 && g > b * 1.2) greenCount++; // Green dominant
-      else if (r > g * 1.2 && r > b * 1.2 && r < 200) brownCount++; // Earthy/Brown
-      else if (r > 150 && g < 150 && b < 150) pinkCount++; // Red/Pinkish
-      else if (r > 200 && g > 150 && b > 150 && r > g + 20) pinkCount++; // Light Pink
+      if (g > r * 1.2 && g > b * 1.2) greenCount++; 
+      else if (r > g * 1.2 && r > b * 1.2 && r < 200) brownCount++; 
+      else if (r > 150 && g < 150 && b < 150) pinkCount++; 
+      else if (r > 200 && g > 150 && b > 150 && r > g + 20) pinkCount++; 
     }
     
     const avgBrightness = totalBrightness / (data.length / 16);
     
-    // Sakura detection (AR Petal drop)
     if (pinkCount > 50 && !foundSakura) {
       setFoundSakura(true);
       addItem({ 
@@ -105,7 +126,6 @@ export default function Aura() {
       });
     }
     
-    // Determine vibe (smooth out over time in a real app, but instant here)
     if (avgBrightness < 60) setVibe('night');
     else if (avgBrightness > 200) setVibe('day');
     else if (greenCount > brownCount && greenCount > pinkCount) setVibe('matcha');
@@ -119,11 +139,13 @@ export default function Aura() {
     if (hasPermission === null) {
       return (
         <motion.div 
-          initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-          className="flex flex-col items-center justify-center text-center space-y-8 max-w-lg mx-auto mt-32"
+          initial={{ opacity: 0, y: 20 }} 
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, ease: 'easeOut' }}
+          className="flex flex-col items-center justify-center text-center space-y-8 max-w-lg mx-auto mt-32 px-6"
         >
-          <div className="w-24 h-24 rounded-full border border-luxury-charcoal/20 flex items-center justify-center mb-4">
-            <span className="text-3xl">👁️</span>
+          <div className="w-24 h-24 rounded-full border border-luxury-charcoal/20 flex items-center justify-center mb-4 bg-white/50 backdrop-blur-sm shadow-sm">
+            <span className="text-3xl opacity-80">👁️</span>
           </div>
           <h1 className="font-serif text-3xl text-luxury-charcoal uppercase tracking-widest">Matcha Oracle</h1>
           <p className="text-luxury-charcoal/60 font-light leading-relaxed">
@@ -131,7 +153,7 @@ export default function Aura() {
           </p>
           <button 
             onClick={startCamera}
-            className="px-8 py-3 bg-luxury-charcoal text-luxury-cream text-[10px] tracking-[0.3em] uppercase hover:bg-luxury-matcha transition-colors"
+            className="px-10 py-4 mt-4 bg-luxury-charcoal text-luxury-cream text-[10px] tracking-[0.3em] uppercase hover:bg-luxury-matcha transition-colors"
           >
             Reveal My Aura
           </button>
@@ -141,49 +163,112 @@ export default function Aura() {
     
     if (hasPermission === false) {
       return (
-        <div className="text-center mt-32">
-          <p>Camera access denied. We cannot read your aura.</p>
-        </div>
+        <motion.div 
+          initial={{ opacity: 0, filter: "blur(10px)" }} 
+          animate={{ opacity: 1, filter: "blur(0px)" }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="flex flex-col items-center justify-center text-center space-y-10 max-w-lg mx-auto mt-24 px-6"
+        >
+          <div className="relative flex items-center justify-center">
+            <div className="absolute inset-0 rounded-full border border-luxury-charcoal/10 animate-ping opacity-20"></div>
+            <div className="w-20 h-20 rounded-full border border-luxury-charcoal/30 flex items-center justify-center bg-white/50 backdrop-blur-sm shadow-sm">
+              <span className="text-2xl opacity-60 font-light">✕</span>
+            </div>
+          </div>
+          
+          <div className="space-y-4">
+            <h1 className="font-serif text-2xl md:text-3xl text-luxury-charcoal uppercase tracking-[0.2em]">Vision Obscured</h1>
+            <p className="text-luxury-charcoal/60 font-light leading-relaxed max-w-md mx-auto">
+              We cannot perceive your aura. The oracle requires a clear view of your environment to craft your bespoke recommendation.
+            </p>
+          </div>
+
+          <div className="w-full h-px bg-gradient-to-r from-transparent via-luxury-charcoal/20 to-transparent"></div>
+          
+          <div className="text-left w-full max-w-sm space-y-4">
+            <p className="text-[10px] tracking-[0.2em] uppercase text-luxury-charcoal/50 text-center mb-4">
+              Restoring the Connection
+            </p>
+            <ul className="text-xs text-luxury-charcoal/70 font-light space-y-3">
+              <li className="flex items-start">
+                <span className="mr-3 opacity-50 mt-0.5 font-serif">I.</span> 
+                Ensure camera permissions are allowed in your browser or device settings.
+              </li>
+              <li className="flex items-start">
+                <span className="mr-3 opacity-50 mt-0.5 font-serif">II.</span> 
+                Verify you are accessing this sanctuary via a secure HTTPS connection.
+              </li>
+              <li className="flex items-start">
+                <span className="mr-3 opacity-50 mt-0.5 font-serif">III.</span> 
+                Confirm no other applications are currently engaging your camera.
+              </li>
+            </ul>
+          </div>
+
+          <a 
+            href="/"
+            className="group relative inline-flex items-center justify-center px-10 py-4 mt-8 bg-transparent text-luxury-charcoal text-[10px] tracking-[0.3em] uppercase overflow-hidden transition-all hover:text-luxury-cream border border-luxury-charcoal/20 hover:border-luxury-charcoal"
+          >
+            <span className="absolute inset-0 w-full h-full bg-luxury-charcoal -translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out"></span>
+            <span className="relative z-10">Return to Home</span>
+          </a>
+        </motion.div>
       );
     }
     
     return (
       <motion.div 
         initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+        transition={{ duration: 1.5 }}
         className="w-full flex flex-col items-center mt-20 px-4"
       >
         {/* AR Viewport */}
-        <div className="relative w-full max-w-sm aspect-[3/4] rounded-t-full overflow-hidden border-4 border-white shadow-2xl mb-12">
+        <div className="relative w-full max-w-sm aspect-[3/4] rounded-t-full overflow-hidden border border-white/20 shadow-[0_20px_50px_rgba(0,0,0,0.1)] mb-12">
           <video 
             ref={videoRef} 
             playsInline 
             muted 
             className="absolute inset-0 w-full h-full object-cover" 
           />
-          {/* Scanning Overlay */}
+          
+          {/* Enhanced Scanning Overlay */}
           <motion.div 
-            animate={{ y: ['0%', '100%', '0%'] }}
-            transition={{ duration: 4, repeat: Infinity, ease: 'linear' }}
-            className="absolute top-0 left-0 w-full h-1 bg-white/50 shadow-[0_0_15px_rgba(255,255,255,0.8)] z-10"
+            animate={{ y: ['-100%', '400%'] }}
+            transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut' }}
+            className="absolute top-0 left-0 w-full h-1/4 bg-gradient-to-b from-transparent via-white/30 to-transparent blur-md z-10"
           />
           
-          {/* AR Sakura Effect */}
+          {/* Enhanced AR Sakura Effect */}
           <AnimatePresence>
             {foundSakura && (
               <motion.div 
-                initial={{ opacity: 0, scale: 0.5 }} 
-                animate={{ opacity: 1, scale: 1 }}
-                className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-pink-500/20 backdrop-blur-sm"
+                initial={{ opacity: 0 }} 
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 1 }}
+                className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-pink-500/20 backdrop-blur-md"
               >
                 <motion.div
-                  animate={{ rotate: 360, y: [0, -20, 0] }}
-                  transition={{ duration: 3, repeat: Infinity }}
-                  className="text-6xl drop-shadow-lg"
+                  initial={{ scale: 0.8, y: 20, rotate: -10 }}
+                  animate={{ 
+                    scale: [1, 1.05, 1],
+                    y: 0,
+                    rotate: [0, 5, -5, 0] 
+                  }}
+                  transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+                  className="text-7xl drop-shadow-[0_0_20px_rgba(255,182,193,0.8)]"
                 >
                   🌸
                 </motion.div>
-                <p className="text-white font-serif tracking-widest mt-4 drop-shadow-md">SAKURA FOUND</p>
-                <p className="text-white/80 text-xs mt-2">Reward added to cart</p>
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4, duration: 0.8 }}
+                  className="flex flex-col items-center"
+                >
+                  <p className="text-white font-serif tracking-[0.3em] mt-6 drop-shadow-md">SAKURA FOUND</p>
+                  <p className="text-white/90 text-[10px] mt-3 uppercase tracking-widest border-t border-white/30 pt-2">Reward added to cart</p>
+                </motion.div>
               </motion.div>
             )}
           </AnimatePresence>
@@ -191,15 +276,16 @@ export default function Aura() {
 
         {/* Oracle Recommendation */}
         <div className="text-center space-y-4">
-          <p className="text-[10px] tracking-[0.4em] uppercase text-luxury-charcoal/50">Current Aura Analysis</p>
-          <div className="h-24">
+          <p className="text-[10px] tracking-[0.4em] uppercase opacity-50">Current Aura Analysis</p>
+          <div className="h-24 px-4">
             <AnimatePresence mode="wait">
               <motion.div
                 key={vibe}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
-                className="font-serif text-2xl text-luxury-charcoal tracking-wide"
+                transition={{ duration: 0.8, ease: 'easeOut' }}
+                className="font-serif text-2xl tracking-wide max-w-sm"
               >
                 {vibe === 'scanning' && "Analyzing your environment..."}
                 {vibe === 'night' && "A dim, calm atmosphere. We recommend a Warm Hojicha to soothe the soul."}
@@ -212,19 +298,34 @@ export default function Aura() {
           </div>
         </div>
         
-        {/* Hidden Canvas for processing */}
         <canvas ref={canvasRef} className="hidden" />
       </motion.div>
     );
   };
 
+  const getVibeStyles = () => {
+    if (foundSakura || vibe === 'sakura') return { bg: '#FFF0F5', text: '#2A2B2A' };
+    switch (vibe) {
+      case 'night': return { bg: '#2A2B2A', text: '#FFFFFF' };
+      case 'day': return { bg: '#F9F6F0', text: '#2A2B2A' };
+      case 'matcha': return { bg: '#E8EFE8', text: '#2A2B2A' };
+      case 'hojicha': return { bg: '#F4ECE6', text: '#2A2B2A' };
+      default: return { bg: '#F2EFE9', text: '#2A2B2A' }; 
+    }
+  };
+  
+  const currentStyles = getVibeStyles();
+
   return (
-    <div className={`min-h-screen pt-32 pb-20 transition-colors duration-1000 ${
-      vibe === 'night' ? 'bg-[#2A2B2A] text-white' : 
-      vibe === 'sakura' || foundSakura ? 'bg-[#FFF0F5]' : 
-      'bg-luxury-cream'
-    }`}>
+    <motion.div 
+      animate={{ 
+        backgroundColor: currentStyles.bg, 
+        color: currentStyles.text 
+      }}
+      transition={{ duration: 2, ease: 'easeInOut' }}
+      className="min-h-screen pt-32 pb-20"
+    >
       {renderContent()}
-    </div>
+    </motion.div>
   );
 }
