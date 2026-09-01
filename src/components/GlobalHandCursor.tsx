@@ -23,6 +23,7 @@ export const GlobalHandCursor: React.FC = () => {
     let currentX = window.innerWidth / 2;
     let currentY = window.innerHeight / 2;
     let lastHandY = -1;
+    let lastHoverCheck = 0;
 
     const initializeHandDetection = async () => {
       try {
@@ -142,39 +143,43 @@ export const GlobalHandCursor: React.FC = () => {
               scrollIconRef.current.style.opacity = '0';
             }
 
-            // Normal hover logic using lerped coordinates
-            const elementUnderCursor = document.elementFromPoint(currentX, currentY);
-            const clickable = elementUnderCursor?.closest(
-              'button, a, [role="button"], [data-clickable="true"]'
-            ) as HTMLElement | null;
+            // Normal hover logic using lerped coordinates - THROTTLED to 50ms
+            const now = performance.now();
+            if (!lastHoverCheck || now - lastHoverCheck > 50) {
+              lastHoverCheck = now;
+              const elementUnderCursor = document.elementFromPoint(currentX, currentY);
+              const clickable = elementUnderCursor?.closest(
+                'button, a, [role="button"], [data-clickable="true"]'
+              ) as HTMLElement | null;
 
-            if (clickable) {
-              if (hoveredElement.current !== clickable) {
-                hoveredElement.current = clickable;
-                hoverStartTime.current = performance.now();
-              } else {
-                const elapsed = performance.now() - (hoverStartTime.current || 0);
-                const progress = Math.min(elapsed / 2000, 1);
-                
-                if (circleRef.current) {
-                  const circumference = 2 * Math.PI * 24;
-                  circleRef.current.style.strokeDashoffset = `${circumference - progress * circumference}`;
-                }
-
-                if (progress === 1) {
-                  clickable.click();
-                  hoverStartTime.current = null;
-                  hoveredElement.current = null;
+              if (clickable) {
+                if (hoveredElement.current !== clickable) {
+                  hoveredElement.current = clickable;
+                  hoverStartTime.current = performance.now();
+                } else {
+                  const elapsed = performance.now() - (hoverStartTime.current || 0);
+                  const progress = Math.min(elapsed / 2000, 1);
+                  
                   if (circleRef.current) {
-                    circleRef.current.style.strokeDashoffset = `${2 * Math.PI * 24}`;
+                    const circumference = 2 * Math.PI * 24;
+                    circleRef.current.style.strokeDashoffset = `${circumference - progress * circumference}`;
+                  }
+
+                  if (progress === 1) {
+                    clickable.click();
+                    hoverStartTime.current = null;
+                    hoveredElement.current = null;
+                    if (circleRef.current) {
+                      circleRef.current.style.strokeDashoffset = `${2 * Math.PI * 24}`;
+                    }
                   }
                 }
-              }
-            } else {
-              hoveredElement.current = null;
-              hoverStartTime.current = null;
-              if (circleRef.current) {
-                circleRef.current.style.strokeDashoffset = `${2 * Math.PI * 24}`;
+              } else {
+                hoveredElement.current = null;
+                hoverStartTime.current = null;
+                if (circleRef.current) {
+                  circleRef.current.style.strokeDashoffset = `${2 * Math.PI * 24}`;
+                }
               }
             }
           }
@@ -218,7 +223,7 @@ export const GlobalHandCursor: React.FC = () => {
       <div 
         ref={cursorRef} 
         className="fixed top-0 left-0 w-16 h-16 pointer-events-none z-[9999] flex items-center justify-center opacity-0 transition-opacity duration-300"
-        style={{ margin: '-32px 0 0 -32px' }}
+        style={{ margin: '-32px 0 0 -32px', willChange: 'transform, opacity' }}
       >
         <div 
           ref={dotRef}
@@ -255,7 +260,6 @@ export const GlobalHandCursor: React.FC = () => {
             fill="none"
             strokeDasharray={2 * Math.PI * 24}
             strokeDashoffset={2 * Math.PI * 24}
-            className="transition-[stroke-dashoffset] duration-75"
           />
         </svg>
       </div>
