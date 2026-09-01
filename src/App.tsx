@@ -9,7 +9,7 @@ import Home from './pages/Home';
 import Menu from './pages/Menu';
 import About from './pages/About';
 import Admin from './pages/Admin';
-import WhiskMatcha from './pages/WhiskMatcha';
+import Aura from './pages/Aura';
 import CanvasBackground from './components/CanvasBackground';
 import FloatingBarista from './components/FloatingBarista';
 import CartDrawer from './components/CartDrawer';
@@ -55,7 +55,7 @@ function AppContent() {
             <Route path="/menu" element={<Menu />} />
             <Route path="/about" element={<About />} />
             <Route path="/admin" element={<Admin />} />
-            <Route path="/whisk" element={<WhiskMatcha />} />
+            <Route path="/aura" element={<Aura />} />
           </Routes>
         </AnimatePresence>
       </main>

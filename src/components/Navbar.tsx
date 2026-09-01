@@ -60,7 +60,7 @@ export default function Navbar() {
                 <Link to="/about" className="hover:text-luxury-charcoal transition-colors duration-500 block p-2">Philosophy</Link>
               </Magnetic>
               <Magnetic strength={30}>
-                <Link to="/whisk" className="hover:text-luxury-charcoal transition-colors duration-500 block p-2">Whisk</Link>
+                <Link to="/aura" className="hover:text-luxury-charcoal transition-colors duration-500 block p-2">Aura</Link>
               </Magnetic>
             </div>
             
@@ -120,8 +120,8 @@ export default function Navbar() {
             </div>
             
             <div className="flex flex-col items-center gap-10 z-10">
-              {['Menu', 'Philosophy', 'Whisk'].map((item, i) => {
-                const path = item === 'Menu' ? '/menu' : item === 'Philosophy' ? '/about' : '/whisk';
+              {['Menu', 'Philosophy', 'Aura'].map((item, i) => {
+                const path = item === 'Menu' ? '/menu' : item === 'Philosophy' ? '/about' : '/aura';
                 return (
                   <motion.div
                     custom={i}
