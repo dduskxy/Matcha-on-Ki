@@ -1,9 +1,14 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { useLightSensor } from '../hooks/useLightSensor';
+import { useAudioSensor } from '../hooks/useAudioSensor';
 import { HandLandmarker, FilesetResolver } from '@mediapipe/tasks-vision';
 
 export const GlobalHandCursor: React.FC = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const cursorRef = useRef<HTMLDivElement>(null);
+  const [videoEl, setVideoEl] = useState<HTMLVideoElement | null>(null);
+  useLightSensor(videoEl);
+  useAudioSensor();
   const circleRef = useRef<SVGCircleElement>(null);
   const dotRef = useRef<HTMLDivElement>(null);
   const scrollIconRef = useRef<SVGSVGElement>(null);
@@ -212,7 +217,7 @@ export const GlobalHandCursor: React.FC = () => {
     <>
       {/* Hidden Webcam Stream for Processing */}
       <video 
-        ref={videoRef} 
+        ref={(el) => { videoRef.current = el; if (!videoEl) setVideoEl(el); }} 
         className="hidden" 
         playsInline 
         autoPlay 

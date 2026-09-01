@@ -17,6 +17,7 @@ import CustomCursor from './components/CustomCursor';
 import Preloader from './components/Preloader';
 import LiveToast from './components/LiveToast';
 import GlobalHandCursor from './components/GlobalHandCursor';
+import { AtmosphereLayer } from './components/AtmosphereLayer';
 
 function AppContent() {
   const location = useLocation();
@@ -48,6 +49,7 @@ function AppContent() {
       <LiveToast />
       <CustomCursor />
       <GlobalHandCursor />
+      <AtmosphereLayer />
       <CanvasBackground />
       <Navbar />
       <main>
