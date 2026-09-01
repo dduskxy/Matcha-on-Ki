@@ -60,14 +60,20 @@ const isCurled = (mcp: Lm, tip: Lm): boolean => tip.y > mcp.y - 0.01;
 
 /**
  * Analyse one hand's landmarks.
- * Returns { indexUp, middleCurled, ringCurled, pinkyCurled, indexTip }.
+ * Returns { indexUp, middleCurled, ringCurled, pinkyCurled, thumbCurled, indexTip }.
+ *
+ * thumbCurled: thumb tip (lm[4]) is close to the index MCP (lm[5]) —
+ * i.e. thumb is folded inward across the palm, as in Sukuna's seal.
+ * Gojo's pose keeps thumbs extended/out, so this differentiates the two.
  */
 function analyseHand(lm: Lm[]) {
   return {
-    indexUp:     isExtended(lm[5], lm[8]),
-    middleCurled: isCurled(lm[9], lm[12]),
+    indexUp:      isExtended(lm[5], lm[8]),
+    middleCurled: isCurled(lm[9],  lm[12]),
     ringCurled:   isCurled(lm[13], lm[16]),
     pinkyCurled:  isCurled(lm[17], lm[20]),
+    // thumb tip within 0.12 normalised units of index MCP → thumb is tucked
+    thumbCurled:  dist2d(lm[4], lm[5]) < 0.12,
     indexTip:     lm[8],
   };
 }
@@ -171,10 +177,13 @@ export function useSukunaGesture(options: SukunaGestureOptions = {}) {
     const othersCurled =
       h0.middleCurled && h0.ringCurled && h0.pinkyCurled &&
       h1.middleCurled && h1.ringCurled && h1.pinkyCurled;
+    // Sukuna's seal: thumbs folded inward. Gojo keeps thumbs out → excludes Gojo pose.
+    const bothThumbsCurled =
+      h0.thumbCurled && h1.thumbCurled;
     const tipsClose =
       dist2d(h0.indexTip, h1.indexTip) < TIP_CROSS_THRESHOLD;
 
-    const poseHeld = bothIndexUp && othersCurled && tipsClose;
+    const poseHeld = bothIndexUp && othersCurled && bothThumbsCurled && tipsClose;
 
     if (poseHeld) {
       holdFrames.current = Math.min(holdFrames.current + 1, HOLD_FRAMES);
