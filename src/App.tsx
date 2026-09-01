@@ -16,6 +16,7 @@ import CartDrawer from './components/CartDrawer';
 import CustomCursor from './components/CustomCursor';
 import Preloader from './components/Preloader';
 import LiveToast from './components/LiveToast';
+import GlobalHandCursor from './components/GlobalHandCursor';
 
 function AppContent() {
   const location = useLocation();
@@ -46,6 +47,7 @@ function AppContent() {
       <Preloader />
       <LiveToast />
       <CustomCursor />
+      <GlobalHandCursor />
       <CanvasBackground />
       <Navbar />
       <main>
