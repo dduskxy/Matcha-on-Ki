@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useEnvironmentStore } from '../store/useEnvironmentStore';
 
 export function useAudioSensor() {

@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 @theme {
-  --color-luxury-cream: #FCFBF8;
-  --color-luxury-charcoal: #0F110C;
+  --color-luxury-cream: var(--theme-bg);
+  --color-luxury-charcoal: var(--theme-text);
   --color-luxury-matcha: #36592C;
   --color-luxury-sand: #F0EEE7;
   --color-luxury-stone: #D1CFC8;
@@ -11,13 +11,35 @@
   --font-serif: 'Cormorant Garamond', 'Noto Serif JP', serif;
 }
 
+:root {
+  --theme-bg: #FCFBF8;
+  --theme-text: #0F110C;
+  transition: background-color 1.5s ease-in-out, color 1.5s ease-in-out;
+}
+
+:root[data-atmosphere="night-focus"] {
+  --theme-bg: #0B0F19; /* Dark space blue/black */
+  --theme-text: #F8FAFC; /* Light gray/white text */
+}
+
+:root[data-atmosphere="evening-chill"] {
+  --theme-bg: #2D2A2E; /* Twilight dark gray */
+  --theme-text: #F5F5F5;
+}
+
+:root[data-atmosphere="morning-zen"] {
+  --theme-bg: #FFFDF8; /* Warmer, brighter cream */
+  --theme-text: #1A1A1A;
+}
+
+:root[data-atmosphere="busy-cafe"] {
+  --theme-bg: #FFF8E7; /* Energetic warm cream */
+  --theme-text: #2A2520;
+}
+
 @layer base {
   body {
     @apply bg-luxury-cream text-luxury-charcoal font-sans antialiased overflow-x-hidden;
-  }
-  
-  @media (pointer: fine) {
-    /* Kept native cursor for better multi-window UX */
   }
   
   h1, h2, h3, h4, h5, h6 {
@@ -36,7 +58,6 @@
     text-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
   }
 
-  /* Elegant Custom Scrollbar for Chatbot */
   .custom-scrollbar::-webkit-scrollbar {
     width: 4px;
     display: block;
@@ -45,7 +66,7 @@
     background: transparent;
   }
   .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: rgba(44, 54, 46, 0.1); /* luxury-charcoal with 10% opacity */
+    background: rgba(44, 54, 46, 0.1);
     border-radius: 10px;
   }
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
@@ -53,15 +74,13 @@
   }
 }
 
-/* Global Scrollbar Hide */
 ::-webkit-scrollbar {
   display: none;
 }
 * {
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
-/* Utility class (kept for fallback compatibility) */
 .hide-scrollbar::-webkit-scrollbar { display: none; }
 .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }

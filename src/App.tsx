@@ -19,7 +19,10 @@ import LiveToast from './components/LiveToast';
 import GlobalHandCursor from './components/GlobalHandCursor';
 import { AtmosphereLayer } from './components/AtmosphereLayer';
 
+import { useEnvironmentStore } from './store/useEnvironmentStore';
 function AppContent() {
+  const atmosphereMode = useEnvironmentStore((state) => state.atmosphereMode);
+  useEffect(() => { document.documentElement.setAttribute('data-atmosphere', atmosphereMode); }, [atmosphereMode]);
   const location = useLocation();
   const navigate = useNavigate();
 

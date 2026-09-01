@@ -16,7 +16,7 @@ export const GlobalHandCursor: React.FC = () => {
   const hoverStartTime = useRef<number | null>(null);
   const hoveredElement = useRef<HTMLElement | null>(null);
   
-  const [isReady, setIsReady] = useState(false);
+  
 
   useEffect(() => {
     let handLandmarker: HandLandmarker;
@@ -51,7 +51,7 @@ export const GlobalHandCursor: React.FC = () => {
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
           videoRef.current.addEventListener('loadeddata', () => {
-            setIsReady(true);
+            
             predictWebcam();
           });
         }
@@ -217,7 +217,7 @@ export const GlobalHandCursor: React.FC = () => {
     <>
       {/* Hidden Webcam Stream for Processing */}
       <video 
-        ref={(el) => { videoRef.current = el; if (!videoEl) setVideoEl(el); }} 
+        ref={videoRef} onLoadedData={(e) => setVideoEl(e.currentTarget)} 
         className="hidden" 
         playsInline 
         autoPlay 
