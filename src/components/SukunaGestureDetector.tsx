@@ -103,17 +103,28 @@ export default function SukunaGestureDetector() {
     cancelAnimationFrame(mirrorRafId.current);
   }, []);
 
-  // ── Start / stop camera when panel opens / closes ─────────────────────────
+  // ── Stop camera & mirror when panel closes ────────────────────────────────
   useEffect(() => {
-    if (panelOpen) {
-      start().then(() => startMirror());
-    } else {
+    if (!panelOpen) {
       stopMirror();
       stop();
     }
     return () => { stopMirror(); };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [panelOpen]);
+
+  // ── Explicit camera start (user-initiated only) ───────────────────────────
+  const handleStartCamera = useCallback(async () => {
+    await start();
+    startMirror();
+  }, [start, startMirror]);
+
+  const handleStopCamera = useCallback(() => {
+    stopMirror();
+    stop();
+  }, [stop, stopMirror]);
+
+  const isCameraActive = state !== 'idle';
 
   // ── State → colours / labels ───────────────────────────────────────────────
   const ringColor = {
@@ -158,6 +169,10 @@ export default function SukunaGestureDetector() {
           ? <CameraOff className="w-5 h-5 text-red-400" strokeWidth={1.5} />
           : <Camera    className="w-5 h-5 text-white/50 group-hover:text-red-400 transition-colors" strokeWidth={1.5} />
         }
+        {/* Live indicator dot */}
+        {isCameraActive && (
+          <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+        )}
       </motion.button>
 
       {/* ── Floating Panel ── */}
@@ -197,140 +212,190 @@ export default function SukunaGestureDetector() {
               </button>
             </div>
 
-            {/* Camera preview */}
-            <div
-              ref={videoContainerRef}
-              className="relative w-full overflow-hidden"
-              style={{ aspectRatio: '4/3', background: '#050202' }}
-            >
-              {/* Mirrored video canvas */}
-              <canvas
-                ref={mirrorCanvasRef}
-                className="w-full h-full object-cover"
-                style={{ display: state !== 'idle' && state !== 'loading' ? 'block' : 'none' }}
-              />
-
-              {/* Skeleton overlay (debug) — flipped to match mirror */}
-              <canvas
-                ref={debugCanvasRef}
-                className="absolute inset-0 w-full h-full pointer-events-none"
-                style={{
-                  transform: 'scaleX(-1)',
-                  display: state !== 'idle' && state !== 'loading' ? 'block' : 'none',
-                }}
-              />
-
-              {/* Idle / Loading overlay */}
-              {(state === 'idle' || state === 'loading') && (
-                <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
-                  <motion.div
-                    animate={state === 'loading' ? { scale: [1, 1.1, 1], opacity: [0.4, 1, 0.4] } : {}}
-                    transition={{ duration: 1.2, repeat: Infinity }}
-                    className="w-16 h-16 rounded-full border border-red-900/40 flex items-center justify-center"
-                  >
-                    <Camera className="w-6 h-6 text-red-900/60" strokeWidth={1} />
-                  </motion.div>
-                  <p className="text-[9px] tracking-[0.25em] uppercase text-white/30">
-                    {state === 'loading' ? 'Loading model…' : 'Initializing…'}
+            {/* ── Consent / Camera Preview ── */}
+            {!isCameraActive ? (
+              /* Consent screen — shown before user grants camera access */
+              <div className="flex flex-col items-center justify-center gap-4 px-5 py-8">
+                <div className="w-16 h-16 rounded-full border border-white/10 flex items-center justify-center">
+                  <Camera className="w-6 h-6 text-white/30" strokeWidth={1} />
+                </div>
+                <div className="text-center space-y-1">
+                  <p className="text-[10px] tracking-[0.2em] uppercase text-white/50">
+                    Camera permission required
+                  </p>
+                  <p className="text-[8px] text-white/25 leading-relaxed">
+                    Your camera is used locally for hand gesture detection only.
+                    No data is sent to any server.
                   </p>
                 </div>
-              )}
+                <button
+                  onClick={handleStartCamera}
+                  className="mt-2 px-4 py-2 rounded-lg text-[9px] tracking-[0.25em] uppercase
+                             bg-red-900/40 text-red-300 border border-red-800/50
+                             hover:bg-red-800/60 hover:text-red-200 transition-all duration-200"
+                >
+                  Allow Camera
+                </button>
+                {error && (
+                  <p className="text-[8px] text-red-500/70 tracking-wider">{error}</p>
+                )}
+              </div>
+            ) : (
+              /* Camera active — show preview */
+              <>
+                {/* Live badge + Stop button */}
+                <div className="flex items-center justify-between px-5 py-2 bg-red-950/20 border-b border-red-900/20">
+                  <div className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+                    <span className="text-[8px] tracking-[0.3em] uppercase text-red-400/80">Live</span>
+                  </div>
+                  <button
+                    onClick={handleStopCamera}
+                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[8px] tracking-wider uppercase
+                               text-red-400/70 border border-red-900/40 hover:bg-red-900/30 hover:text-red-300
+                               transition-all duration-200"
+                  >
+                    <CameraOff className="w-3 h-3" strokeWidth={1.5} />
+                    Stop Camera
+                  </button>
+                </div>
 
-              {/* Scanlines overlay */}
-              <div
-                className="absolute inset-0 pointer-events-none"
-                style={{
-                  backgroundImage:
-                    'repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.08) 2px,rgba(0,0,0,0.08) 4px)',
-                }}
-              />
+                {/* Camera preview */}
+                <div
+                  ref={videoContainerRef}
+                  className="relative w-full overflow-hidden"
+                  style={{ aspectRatio: '4/3', background: '#050202' }}
+                >
+                  {/* Mirrored video canvas */}
+                  <canvas
+                    ref={mirrorCanvasRef}
+                    className="w-full h-full object-cover"
+                    style={{ display: state !== 'idle' && state !== 'loading' ? 'block' : 'none' }}
+                  />
 
-              {/* Charging vignette */}
-              <AnimatePresence>
-                {isCharging && (
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: holdProgress }}
-                    exit={{ opacity: 0 }}
-                    className="absolute inset-0 pointer-events-none"
+                  {/* Skeleton overlay (debug) — flipped to match mirror */}
+                  <canvas
+                    ref={debugCanvasRef}
+                    className="absolute inset-0 w-full h-full pointer-events-none"
                     style={{
-                      background:
-                        'radial-gradient(ellipse at center, transparent 30%, rgba(180,0,0,0.6) 100%)',
+                      transform: 'scaleX(-1)',
+                      display: state !== 'idle' && state !== 'loading' ? 'block' : 'none',
                     }}
                   />
-                )}
-              </AnimatePresence>
 
-              {/* Fired flash */}
-              <AnimatePresence>
-                {state === 'fired' && (
-                  <motion.div
-                    key="flash"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: [0, 0.9, 0] }}
-                    transition={{ duration: 0.5 }}
-                    className="absolute inset-0 bg-red-900 pointer-events-none"
+                  {/* Loading overlay */}
+                  {state === 'loading' && (
+                    <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
+                      <motion.div
+                        animate={{ scale: [1, 1.1, 1], opacity: [0.4, 1, 0.4] }}
+                        transition={{ duration: 1.2, repeat: Infinity }}
+                        className="w-16 h-16 rounded-full border border-red-900/40 flex items-center justify-center"
+                      >
+                        <Camera className="w-6 h-6 text-red-900/60" strokeWidth={1} />
+                      </motion.div>
+                      <p className="text-[9px] tracking-[0.25em] uppercase text-white/30">
+                        Loading model…
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Scanlines overlay */}
+                  <div
+                    className="absolute inset-0 pointer-events-none"
+                    style={{
+                      backgroundImage:
+                        'repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.08) 2px,rgba(0,0,0,0.08) 4px)',
+                    }}
                   />
-                )}
-              </AnimatePresence>
-            </div>
 
-            {/* Status / Charge Bar */}
-            <div className="px-5 py-4">
-              {/* Charge arc + label row */}
-              <div className="flex items-center gap-4">
-                {/* Arc ring */}
-                <div className="relative w-14 h-14 flex-shrink-0">
-                  <ChargeArc progress={holdProgress} />
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <Zap
-                      className="w-5 h-5 transition-colors duration-300"
-                      strokeWidth={1.5}
-                      style={{
-                        color: holdProgress > 0.1 ? `hsl(${Math.round(holdProgress*40)},100%,60%)` : 'rgba(255,255,255,0.2)',
-                        filter: holdProgress > 0.5 ? 'drop-shadow(0 0 6px rgba(239,68,68,0.9))' : undefined,
-                      }}
-                    />
-                  </div>
+                  {/* Charging vignette */}
+                  <AnimatePresence>
+                    {isCharging && (
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: holdProgress }}
+                        exit={{ opacity: 0 }}
+                        className="absolute inset-0 pointer-events-none"
+                        style={{
+                          background:
+                            'radial-gradient(ellipse at center, transparent 30%, rgba(180,0,0,0.6) 100%)',
+                        }}
+                      />
+                    )}
+                  </AnimatePresence>
+
+                  {/* Fired flash */}
+                  <AnimatePresence>
+                    {state === 'fired' && (
+                      <motion.div
+                        key="flash"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: [0, 0.9, 0] }}
+                        transition={{ duration: 0.5 }}
+                        className="absolute inset-0 bg-red-900 pointer-events-none"
+                      />
+                    )}
+                  </AnimatePresence>
                 </div>
 
-                <div className="flex-grow">
-                  {/* State label */}
-                  <motion.p
-                    key={state}
-                    initial={{ opacity: 0, y: 4 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="text-[10px] tracking-[0.2em] uppercase mb-1.5"
-                    style={{ color: isCharging ? '#f87171' : 'rgba(255,255,255,0.4)' }}
-                  >
-                    {stateLabel}
-                  </motion.p>
+                {/* Status / Charge Bar */}
+                <div className="px-5 py-4">
+                  {/* Charge arc + label row */}
+                  <div className="flex items-center gap-4">
+                    {/* Arc ring */}
+                    <div className="relative w-14 h-14 flex-shrink-0">
+                      <ChargeArc progress={holdProgress} />
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <Zap
+                          className="w-5 h-5 transition-colors duration-300"
+                          strokeWidth={1.5}
+                          style={{
+                            color: holdProgress > 0.1 ? `hsl(${Math.round(holdProgress*40)},100%,60%)` : 'rgba(255,255,255,0.2)',
+                            filter: holdProgress > 0.5 ? 'drop-shadow(0 0 6px rgba(239,68,68,0.9))' : undefined,
+                          }}
+                        />
+                      </div>
+                    </div>
 
-                  {/* Progress bar */}
-                  <div className="h-[2px] w-full bg-white/5 rounded-full overflow-hidden">
-                    <motion.div
-                      className="h-full rounded-full"
-                      style={{
-                        background: `hsl(${Math.round(holdProgress * 40)},100%,55%)`,
-                        boxShadow: holdProgress > 0.1 ? '0 0 8px rgba(239,68,68,0.8)' : undefined,
-                      }}
-                      animate={{ width: `${holdProgress * 100}%` }}
-                      transition={{ duration: 0.06 }}
-                    />
+                    <div className="flex-grow">
+                      {/* State label */}
+                      <motion.p
+                        key={state}
+                        initial={{ opacity: 0, y: 4 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="text-[10px] tracking-[0.2em] uppercase mb-1.5"
+                        style={{ color: isCharging ? '#f87171' : 'rgba(255,255,255,0.4)' }}
+                      >
+                        {stateLabel}
+                      </motion.p>
+
+                      {/* Progress bar */}
+                      <div className="h-[2px] w-full bg-white/5 rounded-full overflow-hidden">
+                        <motion.div
+                          className="h-full rounded-full"
+                          style={{
+                            background: `hsl(${Math.round(holdProgress * 40)},100%,55%)`,
+                            boxShadow: holdProgress > 0.1 ? '0 0 8px rgba(239,68,68,0.8)' : undefined,
+                          }}
+                          animate={{ width: `${holdProgress * 100}%` }}
+                          transition={{ duration: 0.06 }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Instruction */}
+                  <div className="mt-4 pt-4 border-t border-white/5">
+                    <p className="text-[8px] text-white/20 tracking-[0.2em] uppercase leading-relaxed">
+                      Both hands · index fingers raised · tips crossed · hold 1.5s
+                    </p>
+                    {error && (
+                      <p className="text-[8px] text-red-500/70 mt-2 tracking-wider">{error}</p>
+                    )}
                   </div>
                 </div>
-              </div>
-
-              {/* Instruction */}
-              <div className="mt-4 pt-4 border-t border-white/5">
-                <p className="text-[8px] text-white/20 tracking-[0.2em] uppercase leading-relaxed">
-                  Both hands · index fingers raised · tips crossed · hold 1.5s
-                </p>
-                {error && (
-                  <p className="text-[8px] text-red-500/70 mt-2 tracking-wider">{error}</p>
-                )}
-              </div>
-            </div>
+              </>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
