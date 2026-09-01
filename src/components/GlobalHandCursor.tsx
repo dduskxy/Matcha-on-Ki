@@ -28,7 +28,7 @@ export const GlobalHandCursor: React.FC = () => {
     let currentX = window.innerWidth / 2;
     let currentY = window.innerHeight / 2;
     let lastHandY = -1;
-    let lastHoverCheck = 0;
+    let frameCount = 0;
 
     const initializeHandDetection = async () => {
       try {
@@ -148,40 +148,41 @@ export const GlobalHandCursor: React.FC = () => {
               scrollIconRef.current.style.opacity = '0';
             }
 
-            // Normal hover logic using lerped coordinates - THROTTLED to 50ms
-            const now = performance.now();
-            if (!lastHoverCheck || now - lastHoverCheck > 50) {
-              lastHoverCheck = now;
+            // Normal hover logic using lerped coordinates
+            frameCount++;
+            if (frameCount % 5 === 0) {
               const elementUnderCursor = document.elementFromPoint(currentX, currentY);
               const clickable = elementUnderCursor?.closest(
                 'button, a, [role="button"], [data-clickable="true"]'
               ) as HTMLElement | null;
 
-              if (clickable) {
-                if (hoveredElement.current !== clickable) {
-                  hoveredElement.current = clickable;
+              if (clickable !== hoveredElement.current) {
+                hoveredElement.current = clickable;
+                if (clickable) {
                   hoverStartTime.current = performance.now();
                 } else {
-                  const elapsed = performance.now() - (hoverStartTime.current || 0);
-                  const progress = Math.min(elapsed / 2000, 1);
-                  
+                  hoverStartTime.current = null;
                   if (circleRef.current) {
-                    const circumference = 2 * Math.PI * 24;
-                    circleRef.current.style.strokeDashoffset = `${circumference - progress * circumference}`;
-                  }
-
-                  if (progress === 1) {
-                    clickable.click();
-                    hoverStartTime.current = null;
-                    hoveredElement.current = null;
-                    if (circleRef.current) {
-                      circleRef.current.style.strokeDashoffset = `${2 * Math.PI * 24}`;
-                    }
+                    circleRef.current.style.strokeDashoffset = `${2 * Math.PI * 24}`;
                   }
                 }
-              } else {
-                hoveredElement.current = null;
+              }
+            }
+
+            // Always update animation every frame if hovered
+            if (hoveredElement.current && hoverStartTime.current) {
+              const elapsed = performance.now() - hoverStartTime.current;
+              const progress = Math.min(elapsed / 2000, 1);
+              
+              if (circleRef.current) {
+                const circumference = 2 * Math.PI * 24;
+                circleRef.current.style.strokeDashoffset = `${circumference - progress * circumference}`;
+              }
+
+              if (progress === 1) {
+                hoveredElement.current.click();
                 hoverStartTime.current = null;
+                hoveredElement.current = null;
                 if (circleRef.current) {
                   circleRef.current.style.strokeDashoffset = `${2 * Math.PI * 24}`;
                 }

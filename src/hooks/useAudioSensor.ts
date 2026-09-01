@@ -6,7 +6,7 @@ export function useAudioSensor() {
   const [error, setError] = useState<Error | null>(null);
   
   useEffect(() => {
-    let animationFrameId: number;
+    let intervalId: number;
     let audioContext: AudioContext | null = null;
     let stream: MediaStream | null = null;
 
@@ -21,23 +21,18 @@ export function useAudioSensor() {
         source.connect(analyser);
         const dataArray = new Uint8Array(analyser.frequencyBinCount);
 
-        let lastUpdate = performance.now();
         const measureVolume = () => {
-          const now = performance.now();
-          if (now - lastUpdate > 1000) { // Update store every 1 second
-            analyser.getByteFrequencyData(dataArray);
-            let sum = 0;
-            for (let i = 0; i < dataArray.length; i++) {
-              sum += dataArray[i];
-            }
-            const averageVolume = sum / dataArray.length;
-            const volumePercentage = Math.round((averageVolume / 255) * 100);
-            setNoiseLevel(volumePercentage);
-            lastUpdate = now;
+          analyser.getByteFrequencyData(dataArray);
+          let sum = 0;
+          for (let i = 0; i < dataArray.length; i++) {
+            sum += dataArray[i];
           }
-          animationFrameId = requestAnimationFrame(measureVolume);
+          const averageVolume = sum / dataArray.length;
+          const volumePercentage = Math.round((averageVolume / 255) * 100);
+          setNoiseLevel(volumePercentage);
         };
-        measureVolume();
+        // Update store every 1 second
+        intervalId = window.setInterval(measureVolume, 1000);
       } catch (err) {
         setError(err instanceof Error ? err : new Error(String(err)));
       }
@@ -46,7 +41,7 @@ export function useAudioSensor() {
     startAudioSensor();
 
     return () => {
-      if (animationFrameId) cancelAnimationFrame(animationFrameId);
+      if (intervalId) clearInterval(intervalId);
       if (stream) stream.getTracks().forEach((track) => track.stop());
       if (audioContext && audioContext.state !== 'closed') {
         audioContext.close().catch(console.error);

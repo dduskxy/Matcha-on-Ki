@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { memo, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useEnvironmentStore, type AtmosphereMode } from '../store/useEnvironmentStore';
 
-export const AtmosphereLayer: React.FC = () => {
+export const AtmosphereLayer: React.FC = memo(() => {
   const atmosphereMode = useEnvironmentStore((state) => state.atmosphereMode);
 
   const getBackground = (mode: AtmosphereMode) => {
@@ -56,10 +56,10 @@ export const AtmosphereLayer: React.FC = () => {
       </AnimatePresence>
     </div>
   );
-};
+});
 
-const Stars: React.FC = () => {
-  const stars = React.useMemo(() => {
+const Stars: React.FC = memo(() => {
+  const stars = useMemo(() => {
     return Array.from({ length: 30 }).map(() => ({
       top: `${Math.random() * 100}%`,
       left: `${Math.random() * 100}%`,
@@ -93,14 +93,15 @@ const Stars: React.FC = () => {
             backgroundColor: '#fbbf24',
             borderRadius: '50%',
             boxShadow: '0 0 8px rgba(251, 191, 36, 0.6)',
+            willChange: 'opacity, transform',
           }}
         />
       ))}
     </>
   );
-};
+});
 
-const SunGlow: React.FC = () => (
+const SunGlow: React.FC = memo(() => (
   <motion.div
     initial={{ scale: 0.8, opacity: 0 }}
     animate={{ scale: 1, opacity: 0.6 }}
@@ -113,12 +114,13 @@ const SunGlow: React.FC = () => (
       height: '60vw',
       background: 'radial-gradient(circle, rgba(253,230,138,0.4) 0%, rgba(255,255,255,0) 70%)',
       borderRadius: '50%',
+      willChange: 'opacity, transform',
     }}
   />
-);
+));
 
-const CafeParticles: React.FC = () => {
-  const particles = React.useMemo(() => {
+const CafeParticles: React.FC = memo(() => {
+  const particles = useMemo(() => {
     return Array.from({ length: 15 }).map(() => ({
       startX: `${Math.random() * 100}vw`,
       endX: `calc(${Math.random() * 100}vw + ${Math.random() * 20 - 10}vw)`,
@@ -143,9 +145,10 @@ const CafeParticles: React.FC = () => {
             backgroundColor: 'rgba(245, 158, 11, 0.3)',
             borderRadius: '50%',
             filter: 'blur(2px)',
+            willChange: 'transform, opacity',
           }}
         />
       ))}
     </>
   );
-};
+});

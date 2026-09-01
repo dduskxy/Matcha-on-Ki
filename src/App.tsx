@@ -20,7 +20,9 @@ import GlobalHandCursor from './components/GlobalHandCursor';
 import { AtmosphereLayer } from './components/AtmosphereLayer';
 
 import { useEnvironmentStore } from './store/useEnvironmentStore';
-function AppContent() {
+import { memo } from 'react';
+
+const AppContent = memo(function AppContent() {
   const atmosphereMode = useEnvironmentStore((state) => state.atmosphereMode);
   useEffect(() => { document.documentElement.setAttribute('data-atmosphere', atmosphereMode); }, [atmosphereMode]);
   const location = useLocation();
@@ -71,7 +73,7 @@ function AppContent() {
       <FloatingBarista />
     </div>
   );
-}
+});
 
 function App() {
   return (

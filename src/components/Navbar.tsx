@@ -1,36 +1,35 @@
-import { useState } from 'react';
+import { useState, memo } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCartStore } from '../store/useCartStore';
 import Magnetic from './Magnetic';
 
-export default function Navbar() {
-  const { toggleCart, items } = useCartStore();
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  
-  const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
+const menuVariants: any = {
+  closed: {
+    opacity: 0,
+    y: "-100%",
+    transition: { duration: 0.8, ease: "easeOut" }
+  },
+  open: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.8, ease: "easeOut" }
+  }
+};
 
-  const menuVariants: any = {
-    closed: {
-      opacity: 0,
-      y: "-100%",
-      transition: { duration: 0.8, ease: "easeOut" }
-    },
-    open: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.8, ease: "easeOut" }
-    }
-  };
-  
-  const linkVariants: any = {
-    closed: { opacity: 0, y: 20 },
-    open: (i: number) => ({
-      opacity: 1, 
-      y: 0,
-      transition: { delay: 0.3 + (i * 0.1), duration: 0.8, ease: "easeOut" }
-    })
-  };
+const linkVariants: any = {
+  closed: { opacity: 0, y: 20 },
+  open: (i: number) => ({
+    opacity: 1, 
+    y: 0,
+    transition: { delay: 0.3 + (i * 0.1), duration: 0.8, ease: "easeOut" }
+  })
+};
+
+const Navbar = memo(function Navbar() {
+  const toggleCart = useCartStore((state) => state.toggleCart);
+  const itemCount = useCartStore((state) => state.items.reduce((sum, item) => sum + item.quantity, 0));
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
     <>
@@ -161,4 +160,6 @@ export default function Navbar() {
       </AnimatePresence>
     </>
   );
-}
+});
+
+export default Navbar;

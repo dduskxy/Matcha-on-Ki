@@ -69,10 +69,8 @@ const SingleLeaf = ({ leaf, geometry }: { leaf: any, geometry: THREE.BufferGeome
 
   return (
     <mesh ref={meshRef} geometry={geometry}>
-      <meshStandardMaterial 
+      <meshLambertMaterial 
         color={leaf.color}
-        roughness={0.7}
-        metalness={0.1}
         side={THREE.DoubleSide}
       />
     </mesh>

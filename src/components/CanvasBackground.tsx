@@ -19,7 +19,7 @@ const ZenStones = () => {
     <group ref={groupRef} position={[0, -0.5, 0]} scale={1.3}>
       {/* Bottom Stone (Deep Walnut Wood/Earth - "Ki" Element) */}
       <mesh position={[0, -0.9, 0]} rotation={[0.05, 0.4, -0.05]} scale={[1.9, 0.4, 1.8]}>
-        <sphereGeometry args={[1, 32, 32]} />
+        <sphereGeometry args={[1, 24, 24]} />
         <meshStandardMaterial 
           color="#2c1e16" 
           roughness={0.9} 
@@ -29,7 +29,7 @@ const ZenStones = () => {
       
       {/* Middle Stone (Wabi-Sabi Ceramic Chawan - "Tea Bowl" Element) */}
       <mesh position={[0.1, -0.3, 0.05]} rotation={[-0.1, -0.2, 0.1]} scale={[1.2, 0.35, 1.1]}>
-        <sphereGeometry args={[1, 32, 32]} />
+        <sphereGeometry args={[1, 24, 24]} />
         <meshStandardMaterial 
           color="#e8e3d9" 
           roughness={0.3} 
@@ -39,7 +39,7 @@ const ZenStones = () => {
 
       {/* Top Stone (Ceremonial Matcha Gem - "Matcha" Element) */}
       <mesh position={[-0.05, 0.15, -0.05]} rotation={[0.15, 0.6, -0.15]} scale={[0.6, 0.25, 0.5]}>
-        <sphereGeometry args={[1, 32, 32]} />
+        <sphereGeometry args={[1, 24, 24]} />
         <meshStandardMaterial 
           color="#4a7a3a"
           roughness={0.1}
@@ -84,7 +84,7 @@ export default function CanvasBackground() {
     <div className="fixed inset-0 z-[-10]">
       <Canvas 
         camera={{ position: [0, 0, 7], fov: 45 }} 
-        dpr={1} 
+        dpr={[1, 1.5]} 
         performance={{ min: 0.5 }}
         gl={{ antialias: true, stencil: false, depth: true, powerPreference: "high-performance" }}
       >

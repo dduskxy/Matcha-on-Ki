@@ -8,9 +8,9 @@ export function useLightSensor(videoElement: HTMLVideoElement | null) {
     if (!videoElement) return;
 
     const canvas = document.createElement('canvas');
-    canvas.width = 64;
-    canvas.height = 64;
-    const ctx = canvas.getContext('2d');
+    canvas.width = 16;
+    canvas.height = 16;
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
     if (!ctx) return;
 
     const analyzeBrightness = () => {

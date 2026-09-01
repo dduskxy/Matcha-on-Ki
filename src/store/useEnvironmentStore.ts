@@ -11,6 +11,8 @@ interface EnvironmentState {
   noiseLevel: number;
   lightLevel: number;
   atmosphereMode: AtmosphereMode;
+  overrideMode: AtmosphereMode | null;
+  setOverrideMode: (mode: AtmosphereMode | null) => void;
   setNoiseLevel: (level: number) => void;
   setLightLevel: (level: number) => void;
 }
@@ -35,12 +37,14 @@ export const useEnvironmentStore = create<EnvironmentState>((set) => ({
   noiseLevel: 0,
   lightLevel: 50,
   atmosphereMode: 'normal',
+  overrideMode: null,
+  setOverrideMode: (mode) => set(() => ({ overrideMode: mode })),
   setNoiseLevel: (level: number) => set((state) => {
     const newNoise = Math.max(0, Math.min(100, level));
-    return { noiseLevel: newNoise, atmosphereMode: calculateMode(newNoise, state.lightLevel) };
+    return { noiseLevel: newNoise, atmosphereMode: state.overrideMode || calculateMode(newNoise, state.lightLevel) };
   }),
   setLightLevel: (level: number) => set((state) => {
     const newLight = Math.max(0, Math.min(100, level));
-    return { lightLevel: newLight, atmosphereMode: calculateMode(state.noiseLevel, newLight) };
+    return { lightLevel: newLight, atmosphereMode: state.overrideMode || calculateMode(state.noiseLevel, newLight) };
   }),
 }));

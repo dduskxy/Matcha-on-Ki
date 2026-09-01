@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import EnvironmentDiagnosticPanel from '../components/EnvironmentDiagnosticPanel';
 import { useMenuStore } from '../store/useMenuStore';
 import PageTransition from '../components/PageTransition';
 import { Settings, Save, CheckCircle2, Lock, ArrowRight, LogOut } from 'lucide-react';
@@ -131,6 +132,8 @@ export default function Admin() {
             <LogOut className="w-3 h-3" /> Terminate Session
           </button>
         </div>
+
+        <EnvironmentDiagnosticPanel />
 
         <div className="bg-[#111] rounded-2xl border border-white/10 overflow-hidden shadow-2xl">
           <div className="grid grid-cols-12 gap-4 p-6 bg-black/40 border-b border-white/10 text-[9px] tracking-[0.3em] uppercase text-white/50 font-medium">
