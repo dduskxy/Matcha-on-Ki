@@ -44,7 +44,7 @@ export default function Navbar() {
           
           {/* Logo */}
           <Magnetic strength={15}>
-            <Link to="/" onClick={() => setIsMobileMenuOpen(false)} className="font-serif text-sm md:text-base text-luxury-charcoal tracking-[0.4em] uppercase hover:opacity-50 transition-opacity duration-500 block">
+            <Link to="/" onClick={() => setIsMobileMenuOpen(false)} className="font-serif text-sm md:text-base text-luxury-charcoal tracking-[0.4em] uppercase hover:opacity-50 transition-opacity duration-500 block relative before:absolute before:-inset-4 before:content-['']">
               Matcha no Ki
             </Link>
           </Magnetic>
@@ -54,13 +54,13 @@ export default function Navbar() {
             {/* Desktop Links */}
             <div className="hidden md:flex gap-16">
               <Magnetic strength={30}>
-                <Link to="/menu" className="hover:text-luxury-charcoal transition-colors duration-500 block p-2">Menu</Link>
+                <Link to="/menu" className="hover:text-luxury-charcoal transition-colors duration-500 block p-2 relative before:absolute before:-inset-4 before:content-['']">Menu</Link>
               </Magnetic>
               <Magnetic strength={30}>
-                <Link to="/about" className="hover:text-luxury-charcoal transition-colors duration-500 block p-2">Philosophy</Link>
+                <Link to="/about" className="hover:text-luxury-charcoal transition-colors duration-500 block p-2 relative before:absolute before:-inset-4 before:content-['']">Philosophy</Link>
               </Magnetic>
               <Magnetic strength={30}>
-                <Link to="/kiosk" className="hover:text-luxury-charcoal transition-colors duration-500 block p-2">Kiosk</Link>
+                <Link to="/kiosk" className="hover:text-luxury-charcoal transition-colors duration-500 block p-2 relative before:absolute before:-inset-4 before:content-['']">Kiosk</Link>
               </Magnetic>
             </div>
             
@@ -69,7 +69,7 @@ export default function Navbar() {
               <Magnetic strength={30}>
                 <button 
                   onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                  className="hover:text-luxury-charcoal transition-colors duration-500 block p-2 relative z-[60]"
+                  className="hover:text-luxury-charcoal transition-colors duration-500 block p-2 relative z-[60] before:absolute before:-inset-4 before:content-['']"
                 >
                   {isMobileMenuOpen ? 'CLOSE' : 'MENU'}
                 </button>

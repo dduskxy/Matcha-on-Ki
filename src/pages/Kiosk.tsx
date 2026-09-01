@@ -81,7 +81,7 @@ export const Kiosk: React.FC = () => {
               
               <button 
                 onClick={startAnalysis}
-                className="relative group bg-stone-900 text-white px-12 py-6 rounded-full font-serif text-xl overflow-hidden focus:outline-none focus:ring-4 focus:ring-rose-200"
+                className="relative group bg-stone-900 text-white px-16 py-8 rounded-full font-serif text-xl overflow-hidden focus:outline-none focus:ring-4 focus:ring-rose-200"
               >
                 <div className="absolute inset-0 bg-rose-900 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out" />
                 <span className="relative z-10 flex items-center gap-3">
@@ -185,12 +185,12 @@ export const Kiosk: React.FC = () => {
                 <h4 className="text-stone-400 uppercase tracking-widest text-xs mb-6 text-center border-b border-stone-200 pb-4">
                   Or explore other options
                 </h4>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
                   {otherItems.map((item, idx) => (
                     <motion.button
                       key={item.id}
                       onClick={() => handleItemClick(item)}
-                      className="bg-white p-6 rounded-2xl shadow-lg shadow-stone-200/40 border border-stone-100 flex flex-col items-center text-center group focus:outline-none focus:ring-4 focus:ring-rose-200"
+                      className="bg-white p-8 md:p-10 rounded-2xl shadow-lg shadow-stone-200/40 border border-stone-100 flex flex-col items-center text-center group focus:outline-none focus:ring-4 focus:ring-rose-200"
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.5 + (idx * 0.1) }}
@@ -209,7 +209,7 @@ export const Kiosk: React.FC = () => {
               
               <button 
                 onClick={() => setStep('idle')}
-                className="mt-12 text-stone-400 hover:text-stone-800 transition-colors uppercase tracking-widest text-xs"
+                className="mt-12 text-stone-400 hover:text-stone-800 transition-colors uppercase tracking-widest text-xs p-8 -m-8 relative z-10"
               >
                 Start Over
               </button>
