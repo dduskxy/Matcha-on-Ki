@@ -270,7 +270,7 @@ export default function SukunaGestureDetector() {
                   <canvas
                     ref={mirrorCanvasRef}
                     className="w-full h-full object-cover"
-                    style={{ display: state !== 'idle' && state !== 'loading' ? 'block' : 'none' }}
+                    style={{ display: state !== 'loading' ? 'block' : 'none' }}
                   />
 
                   {/* Skeleton overlay (debug) — flipped to match mirror */}
@@ -279,7 +279,7 @@ export default function SukunaGestureDetector() {
                     className="absolute inset-0 w-full h-full pointer-events-none"
                     style={{
                       transform: 'scaleX(-1)',
-                      display: state !== 'idle' && state !== 'loading' ? 'block' : 'none',
+                      display: state !== 'loading' ? 'block' : 'none',
                     }}
                   />
 
