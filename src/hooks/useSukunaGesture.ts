@@ -1,20 +1,16 @@
 /**
  * useSukunaGesture — Webcam-based hand gesture detector
  *
- * Detects "Sukuna's Fukuma Mizushi" finger seal via MediaPipe HandLandmarker:
- *   - Both hands visible in frame
- *   - Both index fingers raised (extended upward)
- *   - Other fingers curled (closed fist-like)
- *   - Index finger tips of both hands are close together (crossed / touching)
+ * Detects Sukuna's "Fukuma Mizushi" domain expansion seal via MediaPipe HandLandmarker.
+ * The seal is the Buddhist ENMATEN MUDRA (Yama, King of Hell):
  *
- * When the seal is held for ~1.5 s, dispatches 'malevolent-shrine' event.
+ *   - Both hands PRESSED TOGETHER (wrists close, hands clasped)
+ *   - MIDDLE + RING fingers on each hand EXTENDED upward (touching between hands)
+ *   - INDEX + PINKY + THUMB on each hand FOLDED / curled inward
  *
- * Landmark indices (MediaPipe 21-point model):
- *   WRIST=0  THUMB_TIP=4
- *   INDEX_MCP=5  INDEX_TIP=8
- *   MIDDLE_MCP=9  MIDDLE_TIP=12
- *   RING_MCP=13  RING_TIP=16
- *   PINKY_MCP=17 PINKY_TIP=20
+ * This is the EXACT OPPOSITE of Gojo's Taishakuten-In (one hand, index up, middle wrapped).
+ *
+ * When held for ~1.5 s → dispatches 'malevolent-shrine' event.
  */
 
 import { useEffect, useRef, useState, useCallback } from 'react';
@@ -31,8 +27,6 @@ const MODEL_URL =
 const WASM_URL =
   'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm';
 
-/** Normalised-coord distance threshold for index tips to be "touching/crossed" */
-const TIP_CROSS_THRESHOLD = 0.14;
 /** How many consecutive frames the gesture must be held (@ ~30 fps ≈ 1.5 s) */
 const HOLD_FRAMES = 45;
 /** Cooldown after firing (ms) so it doesn't retrigger instantly */
@@ -59,22 +53,33 @@ const isExtended = (mcp: Lm, tip: Lm): boolean => tip.y < mcp.y - 0.04;
 const isCurled = (mcp: Lm, tip: Lm): boolean => tip.y > mcp.y - 0.01;
 
 /**
- * Analyse one hand's landmarks.
- * Returns { indexUp, middleCurled, ringCurled, pinkyCurled, thumbCurled, indexTip }.
+ * Analyse one hand's landmarks for the Enmaten Mudra (Sukuna's Fukuma Mizushi seal).
  *
- * thumbCurled: thumb tip (lm[4]) is close to the index MCP (lm[5]) —
- * i.e. thumb is folded inward across the palm, as in Sukuna's seal.
- * Gojo's pose keeps thumbs extended/out, so this differentiates the two.
+ * TRUE pose (from anime / Buddhist mudra research):
+ *   ✅ Middle finger (9→12) — EXTENDED upward
+ *   ✅ Ring   finger (13→16) — EXTENDED upward, pressed against middle
+ *   ❌ Index  finger  (5→8) — CURLED / folded inward
+ *   ❌ Pinky  finger (17→20) — CURLED / folded inward
+ *   ❌ Thumb             (2→4) — tucked (tip near index MCP lm[5])
+ *
+ * This is the exact opposite of Gojo's Taishakuten-In where index is UP
+ * and middle is wrapped around it.
  */
 function analyseHand(lm: Lm[]) {
   return {
-    indexUp:      isExtended(lm[5], lm[8]),
-    middleCurled: isCurled(lm[9],  lm[12]),
-    ringCurled:   isCurled(lm[13], lm[16]),
-    pinkyCurled:  isCurled(lm[17], lm[20]),
-    // thumb tip within 0.12 normalised units of index MCP → thumb is tucked
-    thumbCurled:  dist2d(lm[4], lm[5]) < 0.12,
-    indexTip:     lm[8],
+    // Core Sukuna fingers — middle & ring must be clearly extended upward
+    middleUp:    isExtended(lm[9],  lm[12]),
+    ringUp:      isExtended(lm[13], lm[16]),
+    // Exclusion fingers — index & pinky must be folded down
+    indexCurled: isCurled(lm[5],  lm[8]),
+    pinkyCurled: isCurled(lm[17], lm[20]),
+    // Thumb tucked inward (tip near index MCP)
+    thumbCurled: dist2d(lm[4], lm[5]) < 0.13,
+    // Wrist position — used to check if hands are pressed together
+    wrist:       lm[0],
+    // Middle & ring tips — both hands' fingers should be close/touching
+    middleTip:   lm[12],
+    ringTip:     lm[16],
   };
 }
 
@@ -172,18 +177,23 @@ export function useSukunaGesture(options: SukunaGestureOptions = {}) {
     const h0 = analyseHand(hands[0]);
     const h1 = analyseHand(hands[1]);
 
-    const bothIndexUp =
-      h0.indexUp && h1.indexUp;
-    const othersCurled =
-      h0.middleCurled && h0.ringCurled && h0.pinkyCurled &&
-      h1.middleCurled && h1.ringCurled && h1.pinkyCurled;
-    // Sukuna's seal: thumbs folded inward. Gojo keeps thumbs out → excludes Gojo pose.
-    const bothThumbsCurled =
-      h0.thumbCurled && h1.thumbCurled;
-    const tipsClose =
-      dist2d(h0.indexTip, h1.indexTip) < TIP_CROSS_THRESHOLD;
+    // ── Enmaten Mudra analysis ─────────────────────────────────────────────
+    // Each hand: middle+ring EXTENDED, index+pinky+thumb CURLED
+    const h0CorrectShape =
+      h0.middleUp && h0.ringUp &&
+      h0.indexCurled && h0.pinkyCurled && h0.thumbCurled;
+    const h1CorrectShape =
+      h1.middleUp && h1.ringUp &&
+      h1.indexCurled && h1.pinkyCurled && h1.thumbCurled;
 
-    const poseHeld = bothIndexUp && othersCurled && bothThumbsCurled && tipsClose;
+    // Hands must be pressed together: wrists within ~0.30 normalised units
+    const wristsTogether = dist2d(h0.wrist, h1.wrist) < 0.30;
+
+    // Middle finger tips from each hand must be close (fingers touching/overlapping)
+    const middleTipsTouching = dist2d(h0.middleTip, h1.middleTip) < 0.12;
+
+    const poseHeld =
+      h0CorrectShape && h1CorrectShape && wristsTogether && middleTipsTouching;
 
     if (poseHeld) {
       holdFrames.current = Math.min(holdFrames.current + 1, HOLD_FRAMES);
@@ -202,7 +212,7 @@ export function useSukunaGesture(options: SukunaGestureOptions = {}) {
       holdFrames.current = Math.max(0, holdFrames.current - 1);
       setHold(holdFrames.current / HOLD_FRAMES);
       setState(
-        hands.length === 2 && (bothIndexUp || tipsClose)
+        hands.length === 2 && (h0CorrectShape || h1CorrectShape || wristsTogether)
           ? 'detecting'
           : 'ready',
       );
