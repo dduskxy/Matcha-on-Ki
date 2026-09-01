@@ -99,24 +99,29 @@ export const Kiosk: React.FC = () => {
               exit={{ opacity: 0, scale: 1.1 }}
               className="text-center flex flex-col items-center"
             >
-              <div className="relative w-64 h-64 mb-12 flex items-center justify-center">
-                {/* Scanning Rings */}
+              <div className="relative w-64 h-64 flex items-center justify-center mb-16">
+                {/* Expanding Zen Ripples */}
+                {[1, 2, 3].map((i) => (
+                  <motion.div
+                    key={i}
+                    className="absolute w-full h-full border border-rose-200/60 rounded-full"
+                    animate={{ scale: [0.5, 1.5], opacity: [0.8, 0] }}
+                    transition={{
+                      duration: 3,
+                      repeat: Infinity,
+                      delay: i * 1,
+                      ease: "easeOut"
+                    }}
+                  />
+                ))}
+                {/* Inner Energy Core */}
                 <motion.div 
-                  className="absolute inset-0 border-2 border-rose-300 rounded-full opacity-50"
-                  animate={{ scale: [1, 1.5, 1], opacity: [0.5, 0, 0.5] }}
+                  animate={{ scale: [1, 1.05, 1], opacity: [0.9, 1, 0.9] }}
                   transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                />
-                <motion.div 
-                  className="absolute inset-4 border-2 border-stone-300 rounded-full opacity-50 border-dashed"
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-                />
-                <motion.div 
-                  className="absolute inset-8 border border-stone-800 rounded-full"
-                  animate={{ scale: [0.9, 1.1, 0.9] }}
-                  transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-                />
-                <div className="text-4xl">👁️</div>
+                  className="w-24 h-24 bg-gradient-to-br from-rose-100 to-stone-100 rounded-full shadow-[0_0_40px_rgba(254,205,211,0.4)] flex items-center justify-center backdrop-blur-md border border-white/60 relative z-10"
+                >
+                   <span className="text-3xl opacity-70">🌸</span>
+                </motion.div>
               </div>
               
               <h2 className="text-2xl font-serif text-stone-800 mb-4 h-8">
