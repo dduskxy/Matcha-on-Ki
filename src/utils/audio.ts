@@ -37,7 +37,7 @@ class AudioController {
 
       osc.start(t);
       osc.stop(t + 0.1);
-    } catch (e) {
+    } catch (_e) {
       // Ignore audio errors (e.g., user hasn't interacted with page yet)
     }
   }
@@ -65,7 +65,46 @@ class AudioController {
 
       osc.start(t);
       osc.stop(t + 1.5);
-    } catch (e) {
+    } catch (_e) {
+      // Ignore audio errors
+    }
+  }
+
+  // A dynamic swishing/frothing sound simulating a chasen (bamboo whisk)
+  playWhiskSwish(intensity: number = 0.5) {
+    try {
+      this.init();
+      if (!this.ctx) return;
+      const t = this.ctx.currentTime;
+      
+      // Create a short burst of white noise
+      const bufferSize = this.ctx.sampleRate * 0.15; // 150ms length
+      const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        data[i] = Math.random() * 2 - 1; 
+      }
+      
+      const noise = this.ctx.createBufferSource();
+      noise.buffer = buffer;
+      
+      // Filter it to sound airy and watery, shifting frequency based on intensity
+      const bandpass = this.ctx.createBiquadFilter();
+      bandpass.type = 'bandpass';
+      bandpass.frequency.value = 800 + (Math.min(intensity, 1) * 1200); 
+      
+      // Envelope for quick fade
+      const gain = this.ctx.createGain();
+      gain.gain.setValueAtTime(0, t);
+      gain.gain.linearRampToValueAtTime(0.15 * Math.min(intensity, 1), t + 0.05);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.15);
+      
+      noise.connect(bandpass);
+      bandpass.connect(gain);
+      gain.connect(this.ctx.destination);
+      
+      noise.start(t);
+    } catch (_e) {
       // Ignore audio errors
     }
   }

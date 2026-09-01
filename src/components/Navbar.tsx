@@ -31,6 +31,9 @@ export default function Navbar() {
             <Magnetic strength={30}>
               <Link to="/about" className="hover:text-luxury-charcoal transition-colors duration-500 block p-2">Philosophy</Link>
             </Magnetic>
+            <Magnetic strength={30}>
+              <Link to="/whisk" className="hover:text-luxury-charcoal transition-colors duration-500 block p-2">Whisk</Link>
+            </Magnetic>
           </div>
           
           <Magnetic strength={30}>
