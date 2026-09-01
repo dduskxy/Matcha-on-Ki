@@ -100,7 +100,8 @@ export default function Aura() {
         description: 'You found the hidden Sakura aura.',
         icon: 'sweet',
         origin: 'AR Environment',
-        brewTemp: 'Ambient'
+        brewTemp: 'Ambient',
+        tastingNotes: ['Sakura', 'Sweet']
       });
     }
     
