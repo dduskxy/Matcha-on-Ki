@@ -8,6 +8,7 @@ export default function Aura() {
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [vibe, setVibe] = useState<VibeType>('scanning');
   const [foundSakura, setFoundSakura] = useState(false);
+  const foundSakuraRef = useRef(false);
   
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -110,7 +111,8 @@ export default function Aura() {
     
     const avgBrightness = totalBrightness / (data.length / 16);
     
-    if (pinkCount > 50 && !foundSakura) {
+    if (pinkCount > 50 && !foundSakuraRef.current) {
+      foundSakuraRef.current = true;
       setFoundSakura(true);
       addItem({ 
         id: 'sakura-reward', 
